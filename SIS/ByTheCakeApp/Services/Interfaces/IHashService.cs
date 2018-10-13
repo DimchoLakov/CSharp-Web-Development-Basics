@@ -1,4 +1,4 @@
-﻿namespace ByTheCakeApp.Services.Interfaces
+﻿namespace ByTheCake.App.Services.Interfaces
 {
     public interface IHashService
     {

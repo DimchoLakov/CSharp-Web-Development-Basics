@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace ByTheCakeApp.Extensions
+namespace ByTheCake.App.Extensions
 {
     public static class StringExtensions
     {

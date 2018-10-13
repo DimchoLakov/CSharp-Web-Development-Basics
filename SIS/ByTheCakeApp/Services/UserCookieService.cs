@@ -2,9 +2,9 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using ByTheCakeApp.Services.Interfaces;
+using ByTheCake.App.Services.Interfaces;
 
-namespace ByTheCakeApp.Services
+namespace ByTheCake.App.Services
 {
     public class UserCookieService : IUserCookieService
     {

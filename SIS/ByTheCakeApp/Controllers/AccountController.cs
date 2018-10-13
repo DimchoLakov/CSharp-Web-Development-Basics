@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using ByTheCakeApp.Data;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
 using System.Linq;
 using System.Text;
-using ByTheCakeApp.Services;
-using ByTheCakeApp.Services.Interfaces;
+using ByTheCake.App.Services;
+using ByTheCake.App.Services.Interfaces;
+using ByTheCakeApp.Data;
 using ByTheCakeApp.Models;
 using SIS.HTTP.Cookies;
+using SIS.HTTP.Requests.Interfaces;
+using SIS.HTTP.Responses.Interfaces;
 using SIS.WebServer.Results;
 
-namespace ByTheCakeApp.Controllers
+namespace ByTheCake.App.Controllers
 {
     public class AccountController : BaseController
     {

@@ -3,7 +3,7 @@ using SIS.HTTP.Requests.Interfaces;
 using SIS.HTTP.Responses.Interfaces;
 using SIS.WebServer.Results;
 
-namespace ByTheCakeApp.Controllers
+namespace ByTheCake.App.Controllers
 {
     public class HomeController : BaseController
     {

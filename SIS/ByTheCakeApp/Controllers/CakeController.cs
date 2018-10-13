@@ -1,15 +1,14 @@
-﻿using ByTheCakeApp.Data;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
-using ByTheCakeApp.Extensions;
-using ByTheCakeApp.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Castle.DynamicProxy.Contributors;
+using ByTheCake.App.Extensions;
+using ByTheCakeApp.Data;
+using ByTheCakeApp.Models;
+using SIS.HTTP.Requests.Interfaces;
+using SIS.HTTP.Responses.Interfaces;
 
-namespace ByTheCakeApp.Controllers
+namespace ByTheCake.App.Controllers
 {
     public class CakeController : BaseController
     {

@@ -1,9 +1,9 @@
-﻿using ByTheCakeApp.Controllers;
+﻿using ByTheCake.App.Controllers;
 using SIS.HTTP.Enums;
 using SIS.WebServer;
 using SIS.WebServer.Routing;
 
-namespace ByTheCakeApp
+namespace ByTheCake.App
 {
     public class Launcher
     {
