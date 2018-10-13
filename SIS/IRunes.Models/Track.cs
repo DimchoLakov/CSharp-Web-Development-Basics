@@ -7,7 +7,7 @@ namespace IRunes.Models
     {
         public Track()
         {
-            this.Id = new Guid().ToString();
+            this.Id = Guid.NewGuid().ToString();
             this.TrackAlbums = new HashSet<AlbumTrack>();
         }
 

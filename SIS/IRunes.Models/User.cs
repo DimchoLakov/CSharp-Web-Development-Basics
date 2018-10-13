@@ -7,7 +7,7 @@ namespace IRunes.Models
     {
         public User()
         {
-            this.Id = new Guid().ToString();
+            this.Id = Guid.NewGuid().ToString();
             this.Albums = new List<Album>();
         }
 

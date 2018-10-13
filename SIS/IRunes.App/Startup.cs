@@ -18,7 +18,13 @@ namespace IRunes.App
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/users/login"] = request => new UserController().Login(request);
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/users/register"] = request => new UserController().Register(request);
 
+
             //// POST Requests
+
+            serverRoutingTable.Routes[HttpRequestMethod.Post]["/users/login"] =
+                request => new UserController().DoLogin(request);
+            serverRoutingTable.Routes[HttpRequestMethod.Post]["/users/register"] =
+                request => new UserController().DoRegister(request);
 
             var server = new Server(80, serverRoutingTable);
             server.Run();
