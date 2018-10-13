@@ -1,0 +1,11 @@
+﻿<div>@Model.Cover</div>
+<div>@Model.Name</div>
+<div>@Model.Price</div>
+<br />
+<p><b>Tracks</b></p>
+<hr />
+<a href="/tracks/create?=albumId=@Model.Id">Create Track</a>
+<hr />
+@Model.Tracks
+<hr />
+<a href="/albums/all">Back To All</a>
