@@ -20,7 +20,8 @@ namespace IRunes.App
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/albums/all"] = request => new UserController().ShowAlbums(request);
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/albums/create"] = request => new UserController().CreateAlbum(request);
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/albums/details"] = request => new UserController().AlbumDetails(request);
-            
+            serverRoutingTable.Routes[HttpRequestMethod.Get]["/tracks/create"] = request => new UserController().CreateTrack(request);
+            serverRoutingTable.Routes[HttpRequestMethod.Get]["/users/logout"] = request => new UserController().Logout(request);
 
             //// POST Requests
 

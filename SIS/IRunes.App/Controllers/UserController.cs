@@ -108,6 +108,12 @@ namespace IRunes.App.Controllers
             //return View("Index", request);
         }
 
+        public IHttpResponse Logout(IHttpRequest request)
+        {
+            this.LogoutUser(request);
+            return View("Index", request);
+        }
+
         public IHttpResponse ShowAlbums(IHttpRequest request)
         {
             if (!this.IsAuthenticated(request))
@@ -202,6 +208,15 @@ namespace IRunes.App.Controllers
             viewBag.Add("Tracks", sb.ToString());
 
             return View("AlbumDetails", request, viewBag);
+        }
+
+        public IHttpResponse CreateTrack(IHttpRequest request)
+        {
+            if (!this.IsAuthenticated(request))
+            {
+                return View("Index", request);
+            }
+            return View("TrackCreate", request);
         }
     }
 }

@@ -104,5 +104,15 @@ namespace IRunes.App.Controllers
         {
             return request.Session.GetParameter("username").ToString();
         }
+
+        public void LogoutUser(IHttpRequest request)
+        {
+            request.Session.ClearParameters();
+            if (request.Cookies.ContainsCookie(".auth-IRunes"))
+            {
+                var cookie = request.Cookies.GetCookie(".auth-IRunes");
+                cookie.Delete();
+            }
+        }
     }
 }
