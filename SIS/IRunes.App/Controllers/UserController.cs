@@ -59,7 +59,7 @@ namespace IRunes.App.Controllers
 
             if (user == null)
             {
-                return View("Login", request);
+                return View("Index", request);
             }
 
             var view = this.View("Index", request);
@@ -178,7 +178,15 @@ namespace IRunes.App.Controllers
 
         public IHttpResponse AlbumDetails(IHttpRequest request)
         {
-            var albumId = request.QueryData["id"].ToString();
+            var albumId = string.Empty;
+            try
+            {
+                albumId = request.QueryData["id"].ToString();
+            }
+            catch (Exception)
+            {
+                albumId = request.QueryData["albumDetailsId"].ToString();
+            }
 
             var album = this.dbContext.Albums.FirstOrDefault(x => x.Id == albumId);
             if (album == null || !this.IsAuthenticated(request))
@@ -192,7 +200,7 @@ namespace IRunes.App.Controllers
 
             var tracks = this.dbContext.AlbumTracks
                 .Where(x => x.AlbumId == albumId)
-                .Select(x => $"<li><a href=\"/tracks/create?albumId={albumId}\">{x.Track.Name}</a></li>")
+                .Select(x => $"<li><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\">{x.Track.Name}</a></li>")
                 .ToArray();
 
             var tracksAsString = string.Join(string.Empty, tracks);
@@ -216,7 +224,78 @@ namespace IRunes.App.Controllers
             {
                 return View("Index", request);
             }
-            return View("TrackCreate", request);
+
+            var albumId = request.QueryData["albumId"].ToString();
+
+            this.viewBag.Add("AlbumId", albumId);
+            this.viewBag.Add("BackToAlbum", $"<a href=\"/albums/details?id={albumId}\">Back To Album</a>");
+
+            return View("TrackCreate", request, viewBag);
+        }
+
+        public IHttpResponse DoCreateTrack(IHttpRequest request)
+        {
+            var trackName = request.FormData["name"].ToString().Trim();
+            var link = request.FormData["link"].ToString().Trim();
+            var priceAsString = request.FormData["price"].ToString().Trim();
+
+            if (!decimal.TryParse(priceAsString, out decimal price))
+            {
+                return View("TrackCreate", request);
+            }
+
+            var track = new Track()
+            {
+                Name = trackName,
+                Link = link,
+                Price = price
+            };
+
+            var albumId = request.QueryData["albumId"].ToString();
+            var albumTrack = new AlbumTrack()
+            {
+                Track = track,
+                AlbumId = albumId
+            };
+
+            this.dbContext.AlbumTracks.Add(albumTrack);
+
+            try
+            {
+                this.dbContext.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                return this.ServerError(e.Message, request);
+            }
+
+            request.QueryData["albumDetailsId"] = albumId;
+
+            return this.AlbumDetails(request);
+        }
+
+        public IHttpResponse TrackDetails(IHttpRequest request)
+        {
+            var trackId = request.QueryData["trackId"].ToString();
+            var albumId = request.QueryData["albumId"].ToString();
+
+            var track = this.dbContext.Tracks.FirstOrDefault(x => x.Id == trackId);
+
+            if (track == null)
+            {
+                request.QueryData["albumDetailsId"] = albumId;
+                return View("AlbumDetails", request);
+            }
+
+            var decodedLink = track.Link.DecodeUrl();
+            decodedLink = decodedLink.Replace("watch?v=", "embed/");
+
+            viewBag.Add("Link", decodedLink + "/");
+            viewBag.Add("Name", track.Name);
+            viewBag.Add("Price", "$" + track.Price.ToString("f2"));
+            viewBag.Add("BackToAlbum", $"<a href=\"/albums/details?id={albumId}\">Back To Album</a>");
+
+            return View("TrackDetails", request, viewBag);
         }
     }
 }

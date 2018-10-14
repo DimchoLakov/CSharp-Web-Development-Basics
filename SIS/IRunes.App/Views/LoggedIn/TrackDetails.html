@@ -1,5 +1,5 @@
-﻿<div>@Model.Cover</div>
-<div><b>@Model.Name</b></div>
-<div><b>@Model.Price</b></div>
+﻿<div><iframe width="470" height="365" src="@Model.Link"></iframe></div>
+<div><b>Name: @Model.Name</b></div>
+<div><b>Price: @Model.Price</b></div>
 <hr />
-<a href="/album/details?id=@Model.AlbumId">Back To Album</a>
+@Model.BackToAlbum

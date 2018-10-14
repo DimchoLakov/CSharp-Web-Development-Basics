@@ -1,6 +1,6 @@
 ﻿<h1>Create Track</h1>
 <hr />
-<form action="/tracks/create?albumId=@Model.Id" method="post">
+<form action="/tracks/create?albumId=@Model.AlbumId" method="post">
     <div>
         <label for="name">Name</label>
         <input type="text" name="name" placeholder="Name..."/>
@@ -19,4 +19,4 @@
     <button type="submit">Create</button>
 </form>
 <hr />
-<a href="/albums/all">Back To All</a>
+@Model.BackToAlbum
