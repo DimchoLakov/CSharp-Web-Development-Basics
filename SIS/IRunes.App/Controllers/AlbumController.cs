@@ -107,7 +107,7 @@ namespace IRunes.App.Controllers
 
             var tracks = this.dbContext.AlbumTracks
                 .Where(x => x.AlbumId == albumId)
-                .Select(x => $"<li><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\">{x.Track.Name}</a></li>")
+                .Select(x => $"<strong><li><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\">{x.Track.Name}</a></li></strong>")
                 .ToArray();
 
             var tracksAsString = string.Join(string.Empty, tracks);
@@ -200,7 +200,7 @@ namespace IRunes.App.Controllers
             viewBag.Add("Link", decodedLink + "/");
             viewBag.Add("Name", track.Name);
             viewBag.Add("Price", "$" + track.Price.ToString("f2"));
-            viewBag.Add("BackToAlbum", $"<a href=\"/albums/details?id={albumId}\">Back To Album</a>");
+            viewBag.Add("BackToAlbum", $"<a class=\"btn btn-success\" href =\"/albums/details?id={albumId}\">Back To Album</a>");
 
             return View("TrackDetails", request, viewBag);
         }

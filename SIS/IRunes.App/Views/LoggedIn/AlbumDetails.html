@@ -1,19 +1,27 @@
-﻿<div>
-    <img style="max-width: 100%; height: auto;" src="@Model.Cover" alt="Album Cover"/>
+﻿<div class="container-botom-margin">
+    <div>
+        <img style="max-width: 100%; height: auto;" src="@Model.Cover" alt="Album Cover" />
+    </div>
+    <br />
+    <div>
+        <strong>Album Name: @Model.Name</strong>
+    </div>
+    <br />
+    <div>
+        <strong>Album Price: @Model.Price</strong>
+    </div>
+    <br />
+    <p><strong>Tracks</st></p>
+    <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+    <div class="row text-left">
+        <div class="col-sm-6">
+            <a href="/tracks/create?albumId=@Model.AlbumId" class="btn btn-success">Create Track</a>
+        </div>
+        <div class="col-sm-6">
+            <a href="/albums/all" class="btn btn-success">Back To All</a>
+        </div>
+    </div>
+    <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+    @Model.Tracks
+    <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
 </div>
-<br />
-<div>
-    <b>Name: @Model.Name</b>
-</div>
-<br />
-<div>
-    <b>Price: @Model.Price</b>
-</div>
-<br />
-<p><b>Tracks</b></p>
-<hr />
-<a href="/tracks/create?albumId=@Model.AlbumId">Create Track</a>
-<hr />
-@Model.Tracks
-<hr />
-<a href="/albums/all">Back To All</a>
