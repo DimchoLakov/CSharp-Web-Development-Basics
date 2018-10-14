@@ -49,19 +49,6 @@ namespace IRunes.App.Controllers
             return new HtmlResult(allContent, HttpResponseStatusCode.InternalServerError);
         }
 
-        protected string GetUsername(IHttpRequest request)
-        {
-            if (!request.Cookies.ContainsCookie(".auth-IRunes"))
-            {
-                return null;
-            }
-
-            var cookie = request.Cookies.GetCookie(".auth-IRunes");
-            var cookieContent = cookie.Value;
-            var username = this.UserCookieService.GetUserData(cookieContent);
-            return username;
-        }
-
         protected string GetViewContent(string viewName, IHttpRequest request, Dictionary<string, string> viewBag)
         {
             var layout = string.Empty;
