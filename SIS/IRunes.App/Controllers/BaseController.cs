@@ -4,8 +4,8 @@ using IRunes.App.Services;
 using IRunes.App.Services.Interfaces;
 using SIS.HTTP.Cookies;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
+using SIS.HTTP.Requests;
+using SIS.HTTP.Responses;
 using SIS.WebServer.Results;
 
 namespace IRunes.App.Controllers
@@ -51,12 +51,12 @@ namespace IRunes.App.Controllers
 
         protected string GetUsername(IHttpRequest request)
         {
-            if (!request.Cookies.ContainsCookie(".auth-iRunes"))
+            if (!request.Cookies.ContainsCookie(".auth-IRunes"))
             {
                 return null;
             }
 
-            var cookie = request.Cookies.GetCookie(".auth-iRunes");
+            var cookie = request.Cookies.GetCookie(".auth-IRunes");
             var cookieContent = cookie.Value;
             var username = this.UserCookieService.GetUserData(cookieContent);
             return username;
@@ -91,12 +91,18 @@ namespace IRunes.App.Controllers
         {
             request.Session.AddParameter("username", username);
             var userCookieValue = this.UserCookieService.GetUserCookie(username);
-            response.Cookies.Add(new HttpCookie(".auth-iRunes", userCookieValue));
+            response.Cookies.Add(new HttpCookie(".auth-IRunes", userCookieValue, 7));
         }
 
         public bool IsAuthenticated(IHttpRequest request)
         {
             return request.Session.ContainsParameter("username");
+            //return request.Cookies.ContainsCookie(".auth-IRunes");
+        }
+
+        public string GetUsernameFromSession(IHttpRequest request)
+        {
+            return request.Session.GetParameter("username").ToString();
         }
     }
 }

@@ -7,8 +7,8 @@ using ByTheCake.App.Services.Interfaces;
 using ByTheCakeApp.Data;
 using ByTheCakeApp.Models;
 using SIS.HTTP.Cookies;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
+using SIS.HTTP.Requests;
+using SIS.HTTP.Responses;
 using SIS.WebServer.Results;
 
 namespace ByTheCake.App.Controllers

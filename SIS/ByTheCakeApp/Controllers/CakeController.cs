@@ -5,8 +5,8 @@ using System.Text;
 using ByTheCake.App.Extensions;
 using ByTheCakeApp.Data;
 using ByTheCakeApp.Models;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
+using SIS.HTTP.Requests;
+using SIS.HTTP.Responses;
 
 namespace ByTheCake.App.Controllers
 {

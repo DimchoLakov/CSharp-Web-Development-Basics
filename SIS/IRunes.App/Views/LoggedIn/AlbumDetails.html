@@ -1,10 +1,18 @@
-﻿<div>@Model.Cover</div>
-<div>@Model.Name</div>
-<div>@Model.Price</div>
+﻿<div>
+    <img style="max-width: 100%; height: auto;" src="@Model.Cover" alt="Album Cover"/>
+</div>
+<br />
+<div>
+    <b>@Model.Name</b>
+</div>
+<br />
+<div>
+    <b>@Model.Price</b>
+</div>
 <br />
 <p><b>Tracks</b></p>
 <hr />
-<a href="/tracks/create?=albumId=@Model.Id">Create Track</a>
+<a href="/tracks/create?=albumId=@Model.AlbumId">Create Track</a>
 <hr />
 @Model.Tracks
 <hr />
