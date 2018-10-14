@@ -1,5 +1,5 @@
 ﻿using SIS.HTTP.Enums;
-using SIS.HTTP.Responses.Interfaces;
+using SIS.HTTP.Responses;
 using SIS.WebServer.Results;
 
 namespace SIS.Demo

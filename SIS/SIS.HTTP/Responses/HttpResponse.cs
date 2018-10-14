@@ -2,21 +2,15 @@
 using System.Text;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
-using SIS.HTTP.Cookies.Interfaces;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Headers;
-using SIS.HTTP.Headers.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
 using SIS.HTTP.Extensions;
+using SIS.HTTP.Headers;
 
 namespace SIS.HTTP.Responses
 {
     public class HttpResponse : IHttpResponse
     {
-        public HttpResponse()
-        {
-
-        }
+        public HttpResponse() { }
 
         public HttpResponse(HttpResponseStatusCode statusCode)
         {
@@ -28,14 +22,14 @@ namespace SIS.HTTP.Responses
             this.StatusCode = statusCode;
         }
 
-        public HttpResponseStatusCode StatusCode { get; set; }
+        public HttpResponseStatusCode StatusCode { get; set;  }
 
         public IHttpHeaderCollection Headers { get; }
 
         public IHttpCookieCollection Cookies { get; }
 
         public byte[] Content { get; set; }
-
+        
         public void AddHeader(HttpHeader header)
         {
             CoreValidator.ThrowIfNull(header, nameof(header));

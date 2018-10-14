@@ -1,10 +1,8 @@
 ﻿using SIS.HTTP.Cookies;
-using SIS.HTTP.Cookies.Interfaces;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Headers;
-using SIS.HTTP.Headers.Interfaces;
 
-namespace SIS.HTTP.Responses.Interfaces
+namespace SIS.HTTP.Responses
 {
     public interface IHttpResponse
     {
@@ -16,10 +14,10 @@ namespace SIS.HTTP.Responses.Interfaces
 
         byte[] Content { get; set; }
 
-        byte[] GetBytes();
-
         void AddHeader(HttpHeader header);
 
         void AddCookie(HttpCookie cookie);
+
+        byte[] GetBytes();
     }
 }

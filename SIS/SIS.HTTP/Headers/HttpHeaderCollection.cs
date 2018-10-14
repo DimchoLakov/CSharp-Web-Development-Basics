@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SIS.HTTP.Common;
-using SIS.HTTP.Headers.Interfaces;
 
 namespace SIS.HTTP.Headers
 {
@@ -11,7 +10,7 @@ namespace SIS.HTTP.Headers
         public HttpHeaderCollection()
         {
             this.headers = new Dictionary<string, HttpHeader>();
-        }
+        }   
 
         public void Add(HttpHeader header)
         {
@@ -19,7 +18,7 @@ namespace SIS.HTTP.Headers
             this.headers.Add(header.Key, header);
         }
 
-        public bool ContainsKey(string key)
+        public bool ContainsHeader(string key)
         {
             CoreValidator.ThrowIfNull(key, nameof(key));
             return this.headers.ContainsKey(key);

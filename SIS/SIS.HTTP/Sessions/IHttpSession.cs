@@ -1,4 +1,4 @@
-﻿namespace SIS.HTTP.Sessions.Interfaces
+﻿namespace SIS.HTTP.Sessions
 {
     public interface IHttpSession
     {

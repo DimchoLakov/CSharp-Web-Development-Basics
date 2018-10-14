@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ namespace SIS.WebServer
 
         private readonly int port;
 
-        private readonly TcpListener tcpListener;
+        private readonly TcpListener listener;
 
         private readonly ServerRoutingTable serverRoutingTable;
 
@@ -21,25 +21,24 @@ namespace SIS.WebServer
         public Server(int port, ServerRoutingTable serverRoutingTable)
         {
             this.port = port;
-            this.tcpListener = new TcpListener(IPAddress.Parse(LocalhostIpAddress), this.port);
+            this.listener = new TcpListener(IPAddress.Parse(LocalhostIpAddress), port);
 
             this.serverRoutingTable = serverRoutingTable;
         }
 
         public void Run()
         {
-            this.tcpListener.Start();
+            this.listener.Start();
             this.isRunning = true;
 
             Console.WriteLine($"Server started at http://{LocalhostIpAddress}:{this.port}");
-
             while (isRunning)
             {
                 Console.WriteLine("Waiting for client...");
 
-                var client = this.tcpListener.AcceptSocketAsync().GetAwaiter().GetResult();
+                var client = listener.AcceptSocketAsync().GetAwaiter().GetResult();
 
-                Task.Run(() => this.Listen(client));
+                Task.Run(() => Listen(client));
             }
         }
 

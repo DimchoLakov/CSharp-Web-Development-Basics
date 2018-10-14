@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using SIS.HTTP.Common;
 using SIS.HTTP.Cookies;
-using SIS.HTTP.Cookies.Interfaces;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Exceptions;
 using SIS.HTTP.Extensions;
 using SIS.HTTP.Headers;
-using SIS.HTTP.Headers.Interfaces;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Sessions.Interfaces;
+using SIS.HTTP.Sessions;
 
 namespace SIS.HTTP.Requests
 {
@@ -60,8 +57,8 @@ namespace SIS.HTTP.Requests
 
         private bool IsValidRequestLine(string[] requestLine)
         {
-            return requestLine.Length == 3
-                   && requestLine[2].ToLower()
+            return requestLine.Length == 3 
+                   && requestLine[2].ToLower() 
                    != GlobalConstants.HttpOneProtocolFragment;
         }
 
@@ -74,10 +71,7 @@ namespace SIS.HTTP.Requests
         {
             bool parseMethodResult = Enum.TryParse<HttpRequestMethod>(requestLine[0].Capitalize(), out HttpRequestMethod parsedMethod);
 
-            if (!parseMethodResult)
-            {
-                throw new BadRequestException();
-            }
+            if(!parseMethodResult) throw new BadRequestException();
 
             this.RequestMethod = parsedMethod;
         }
@@ -89,8 +83,8 @@ namespace SIS.HTTP.Requests
 
         private void ParseRequestPath()
         {
-            this.Path =
-                this.Url.Split(new[] { HttpRequestUrlQuerySeparator, HttpRequestUrlFragmentSeparator }, StringSplitOptions.RemoveEmptyEntries)[0];
+            this.Path = 
+                this.Url.Split(new[] {HttpRequestUrlQuerySeparator, HttpRequestUrlFragmentSeparator}, StringSplitOptions.RemoveEmptyEntries)[0];
         }
 
         private void ParseHeaders(string[] requestContent)
@@ -104,7 +98,7 @@ namespace SIS.HTTP.Requests
                 this.Headers.Add(new HttpHeader(headerArguments[0], headerArguments[1]));
             }
 
-            if (!this.Headers.ContainsKey(GlobalConstants.HostHeaderKey))
+            if (!this.Headers.ContainsHeader(GlobalConstants.HostHeaderKey))
             {
                 throw new BadRequestException();
             }
@@ -112,7 +106,7 @@ namespace SIS.HTTP.Requests
 
         private void ParseCookies()
         {
-            if (!this.Headers.ContainsKey(HttpHeader.Cookie)) return;
+            if (!this.Headers.ContainsHeader(HttpHeader.Cookie)) return;
 
             string cookiesString = this.Headers.GetHeader(HttpHeader.Cookie).Value;
 
@@ -141,7 +135,7 @@ namespace SIS.HTTP.Requests
             }
 
             string queryString = this.Url
-                .Split(new[] { '?', '#' }, StringSplitOptions.None)[1];
+                .Split(new [] {'?', '#'}, StringSplitOptions.None)[1];
 
             if (string.IsNullOrWhiteSpace(queryString))
             {
@@ -191,10 +185,10 @@ namespace SIS.HTTP.Requests
         private void ParseRequest(string requestString)
         {
             string[] splitRequestContent = requestString
-                .Split(new[] { GlobalConstants.HttpNewLine }, StringSplitOptions.None);
+                .Split(new[] {GlobalConstants.HttpNewLine}, StringSplitOptions.None);
 
             string[] requestLine = splitRequestContent[0].Trim().
-                Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                Split(new [] {' '}, StringSplitOptions.RemoveEmptyEntries);
 
             if (!this.IsValidRequestLine(requestLine))
             {

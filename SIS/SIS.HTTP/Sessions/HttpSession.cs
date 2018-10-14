@@ -1,44 +1,44 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using SIS.HTTP.Sessions.Interfaces;
+﻿using System.Collections.Generic;
 
 namespace SIS.HTTP.Sessions
 {
+    using Common;
+
     public class HttpSession : IHttpSession
     {
-        private readonly Dictionary<string, object> parameters;
+        private readonly Dictionary<string, object> sessionParameters;
 
         public HttpSession(string id)
         {
-            this.parameters = new Dictionary<string, object>();
+            CoreValidator.ThrowIfNull(id, nameof(id));
             this.Id = id;
+            this.sessionParameters = new Dictionary<string, object>();
         }
 
         public string Id { get; }
 
         public object GetParameter(string name)
         {
-            if (!this.ContainsParameter(name))
-            {
-                return null;
-            }
-
-            return this.parameters[name];
+            CoreValidator.ThrowIfNullOrEmpty(name, nameof(name));
+            return this.sessionParameters.GetValueOrDefault(name, null);
         }
 
         public bool ContainsParameter(string name)
         {
-            return this.parameters.ContainsKey(name);
+            CoreValidator.ThrowIfNullOrEmpty(name, nameof(name));
+            return this.sessionParameters.ContainsKey(name);
         }
 
         public void AddParameter(string name, object parameter)
         {
-            this.parameters[name] = parameter;
+            CoreValidator.ThrowIfNullOrEmpty(name, nameof(name));
+            CoreValidator.ThrowIfNull(parameter, nameof(parameter));
+            this.sessionParameters.Add(name, parameter);
         }
 
         public void ClearParameters()
         {
-            this.parameters.Clear();
+            this.sessionParameters.Clear();
         }
     }
 }

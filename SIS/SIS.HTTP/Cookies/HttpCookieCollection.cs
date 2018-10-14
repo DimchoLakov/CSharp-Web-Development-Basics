@@ -1,11 +1,10 @@
 ﻿using System.Collections;
-using System.Linq;
-using SIS.HTTP.Common;
-using SIS.HTTP.Cookies.Interfaces;
+using System.Net;
 
 namespace SIS.HTTP.Cookies
 {
     using System.Collections.Generic;
+    using Common;
 
     public class HttpCookieCollection : IHttpCookieCollection
     {
@@ -21,11 +20,10 @@ namespace SIS.HTTP.Cookies
         public void Add(HttpCookie cookie)
         {
             CoreValidator.ThrowIfNull(cookie, nameof(cookie));
-            if (this.ContainsCookie("SIS_ID") && cookie.Key == "SIS_ID")
+            if (!this.ContainsCookie(cookie.Key))
             {
-                return;
+                this.cookies.Add(cookie.Key, cookie);
             }
-            this.cookies.Add(cookie.Key, cookie);
         }
 
         public bool ContainsCookie(string key)
@@ -42,7 +40,7 @@ namespace SIS.HTTP.Cookies
 
         public bool HasCookies()
         {
-            return this.cookies.Any();
+            return this.cookies.Count > 0;
         }
 
         public IEnumerator<HttpCookie> GetEnumerator()
@@ -52,15 +50,15 @@ namespace SIS.HTTP.Cookies
                 yield return cookie.Value;
             }
         }
-        
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
 
         public override string ToString()
         {
             return string.Join(HttpCookieStringSeparator, this.cookies.Values);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

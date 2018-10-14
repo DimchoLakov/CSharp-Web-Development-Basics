@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.HTTP", "SIS.HTTP\SIS.HTTP.csproj", "{C7EBEE0F-61E9-4C03-BBD8-E4FC64B12D7C}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.WebServer", "SIS.WebServer\SIS.WebServer.csproj", "{3E920BE9-5457-42B4-8441-4ACE72EF04FC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.Demo", "SIS.Demo\SIS.Demo.csproj", "{0043CA69-EE75-4AEC-88FA-7F5DE36E287D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{A2D8E25C-1AB3-42A8-98D4-00FD32BEDDBE}"
@@ -21,11 +17,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CakeApp", "CakeApp", "{7A5D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IRunesApp", "IRunesApp", "{A62CD918-8273-4E43-8261-67BDB560A6DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRunes.Models", "IRunes.Models\IRunes.Models.csproj", "{ABDA344C-3EF5-4D88-B822-2176CC97718A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRunes.Models", "IRunes.Models\IRunes.Models.csproj", "{ABDA344C-3EF5-4D88-B822-2176CC97718A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRunes.Data", "IRunes.Data\IRunes.Data.csproj", "{0167ED7F-A20F-4506-B751-E03601FEB36E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRunes.Data", "IRunes.Data\IRunes.Data.csproj", "{0167ED7F-A20F-4506-B751-E03601FEB36E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRunes.App", "IRunes.App\IRunes.App.csproj", "{35660BD5-B3FE-4B7C-AA4F-117F8E22AEFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRunes.App", "IRunes.App\IRunes.App.csproj", "{35660BD5-B3FE-4B7C-AA4F-117F8E22AEFF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.HTTP", "SIS.HTTP\SIS.HTTP.csproj", "{1450CAA0-763F-433D-8EA8-D29710F0DB5A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIS.WebServer", "SIS.WebServer\SIS.WebServer.csproj", "{69AA04D0-112C-4932-9527-1FA1C8AA0115}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,14 +33,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C7EBEE0F-61E9-4C03-BBD8-E4FC64B12D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7EBEE0F-61E9-4C03-BBD8-E4FC64B12D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7EBEE0F-61E9-4C03-BBD8-E4FC64B12D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7EBEE0F-61E9-4C03-BBD8-E4FC64B12D7C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E920BE9-5457-42B4-8441-4ACE72EF04FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E920BE9-5457-42B4-8441-4ACE72EF04FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E920BE9-5457-42B4-8441-4ACE72EF04FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E920BE9-5457-42B4-8441-4ACE72EF04FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0043CA69-EE75-4AEC-88FA-7F5DE36E287D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0043CA69-EE75-4AEC-88FA-7F5DE36E287D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0043CA69-EE75-4AEC-88FA-7F5DE36E287D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +61,14 @@ Global
 		{35660BD5-B3FE-4B7C-AA4F-117F8E22AEFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35660BD5-B3FE-4B7C-AA4F-117F8E22AEFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35660BD5-B3FE-4B7C-AA4F-117F8E22AEFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1450CAA0-763F-433D-8EA8-D29710F0DB5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1450CAA0-763F-433D-8EA8-D29710F0DB5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1450CAA0-763F-433D-8EA8-D29710F0DB5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1450CAA0-763F-433D-8EA8-D29710F0DB5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69AA04D0-112C-4932-9527-1FA1C8AA0115}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69AA04D0-112C-4932-9527-1FA1C8AA0115}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69AA04D0-112C-4932-9527-1FA1C8AA0115}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69AA04D0-112C-4932-9527-1FA1C8AA0115}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using SIS.HTTP.Cookies.Interfaces;
+using SIS.HTTP.Cookies;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Headers.Interfaces;
-using SIS.HTTP.Sessions.Interfaces;
+using SIS.HTTP.Headers;
+using SIS.HTTP.Sessions;
 
-namespace SIS.HTTP.Requests.Interfaces
+namespace SIS.HTTP.Requests
 {
     public interface IHttpRequest
     {
@@ -18,9 +18,9 @@ namespace SIS.HTTP.Requests.Interfaces
 
         IHttpHeaderCollection Headers { get; }
 
-        HttpRequestMethod RequestMethod { get; }
-        
         IHttpCookieCollection Cookies { get; }
+
+        HttpRequestMethod RequestMethod { get; }
 
         IHttpSession Session { get; set; }
     }

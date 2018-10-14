@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using SIS.HTTP.Enums;
-using SIS.HTTP.Requests.Interfaces;
-using SIS.HTTP.Responses.Interfaces;
+using SIS.HTTP.Requests;
+using SIS.HTTP.Responses;
 
 namespace SIS.WebServer.Routing
 {
@@ -10,7 +10,7 @@ namespace SIS.WebServer.Routing
     {
         public ServerRoutingTable()
         {
-            this.Routes = new Dictionary<HttpRequestMethod, Dictionary<string, Func<IHttpRequest, IHttpResponse>>>()
+            this.Routes = new Dictionary<HttpRequestMethod, Dictionary<string, Func<IHttpRequest, IHttpResponse>>>
             {
                 [HttpRequestMethod.Get] = new Dictionary<string, Func<IHttpRequest, IHttpResponse>>(),
                 [HttpRequestMethod.Post] = new Dictionary<string, Func<IHttpRequest, IHttpResponse>>(),
