@@ -29,7 +29,9 @@ namespace IRunes.App.Controllers
         {
             if (this.IsAuthenticated(request))
             {
-                return View("Index", request);
+                var username = this.GetUsernameFromSession(request);
+                this.viewBag.Add("Username", username);
+                return View("Index", request, viewBag);
             }
             return View("Login", request);
         }
