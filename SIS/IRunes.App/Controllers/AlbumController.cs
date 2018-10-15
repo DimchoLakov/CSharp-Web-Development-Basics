@@ -135,7 +135,7 @@ namespace IRunes.App.Controllers
             var albumId = request.QueryData["albumId"].ToString();
 
             this.viewBag.Add("AlbumId", albumId);
-            this.viewBag.Add("BackToAlbum", $"<a href=\"/albums/details?id={albumId}\">Back To Album</a>");
+            this.viewBag.Add("AlbId", albumId);
 
             return View("TrackCreate", request, viewBag);
         }
@@ -200,7 +200,7 @@ namespace IRunes.App.Controllers
             viewBag.Add("Link", decodedLink + "/");
             viewBag.Add("Name", track.Name);
             viewBag.Add("Price", "$" + track.Price.ToString("f2"));
-            viewBag.Add("BackToAlbum", $"<a class=\"btn btn-success\" href =\"/albums/details?id={albumId}\">Back To Album</a>");
+            viewBag.Add("BackToAlbum", albumId);
 
             return View("TrackDetails", request, viewBag);
         }
