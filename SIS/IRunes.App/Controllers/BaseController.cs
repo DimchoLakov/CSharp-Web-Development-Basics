@@ -12,12 +12,28 @@ namespace IRunes.App.Controllers
 {
     public abstract class BaseController
     {
+        private const string AuthKey = ".auth-IRunes";
+        private const int CookieExpiryDays = 7;
+
         protected BaseController()
         {
             this.UserCookieService = new UserCookieService();
         }
 
         protected IUserCookieService UserCookieService { get; }
+
+        protected string GetUsername(IHttpRequest request)
+        {
+            if (!request.Cookies.ContainsCookie(AuthKey))
+            {
+                return null;
+            }
+
+            var cookie = request.Cookies.GetCookie(AuthKey);
+            var cookieContent = cookie.Value;
+            var username = this.UserCookieService.GetUserData(cookieContent);
+            return username;
+        }
 
         protected IHttpResponse View(string viewName, IHttpRequest request, Dictionary<string, string> viewBag = null)
         {
@@ -74,18 +90,18 @@ namespace IRunes.App.Controllers
             return allContent;
         }
 
-        public void SignInUser(string username, IHttpResponse response, IHttpRequest request)
+        public void SignInUser(string username, IHttpRequest request, IHttpResponse response)
         {
             request.Session.AddParameter("username", username);
             var userCookieValue = this.UserCookieService.GetUserCookie(username);
-            response.Cookies.Add(new HttpCookie(".auth-IRunes", userCookieValue, 7));
+            response.Cookies.Add(new HttpCookie(AuthKey, userCookieValue, CookieExpiryDays));
         }
 
         public bool IsAuthenticated(IHttpRequest request)
         {
-            return request.Session.ContainsParameter("username");
+            //return request.Session.ContainsParameter("username");
 
-            //return request.Cookies.ContainsCookie(".auth-IRunes");
+            return request.Cookies.ContainsCookie(AuthKey);
         }
 
         public string GetUsernameFromSession(IHttpRequest request)
@@ -93,14 +109,13 @@ namespace IRunes.App.Controllers
             return request.Session.GetParameter("username").ToString();
         }
 
-        public void LogoutUser(IHttpRequest request)
+        public void LogoutUser(IHttpRequest request, IHttpResponse response)
         {
             request.Session.ClearParameters();
-            if (request.Cookies.ContainsCookie(".auth-IRunes"))
-            {
-                var cookie = request.Cookies.GetCookie(".auth-IRunes");
-                cookie.Delete();
-            }
+
+            var cookie = request.Cookies.GetCookie(AuthKey);
+            cookie.Delete();
+            response.AddCookie(cookie);
         }
     }
 }

@@ -5,13 +5,17 @@ using IRunes.App.Services;
 using IRunes.App.Services.Interfaces;
 using IRunes.Data;
 using IRunes.Models;
+using SIS.HTTP.Cookies;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
+using SIS.WebServer.Results;
 
 namespace IRunes.App.Controllers
 {
     public class UserController : BaseController
     {
+        private const string AuthKey = ".auth-IRunes";
+
         private IHashService hashService;
         private IRunesDbContext dbContext;
         private Dictionary<string, string> viewBag;
@@ -52,23 +56,20 @@ namespace IRunes.App.Controllers
 
             if (this.IsAuthenticated(request))
             {
-                return View("Index", request);
+                return new RedirectResult("/");
             }
 
             var user = this.dbContext.Users.FirstOrDefault(x => x.Username == username && x.Password == hashedPassword);
 
             if (user == null)
             {
-                return View("Index", request);
+                return this.BadRequestError("Invalid username or password!", request);
             }
 
-            var view = this.View("Index", request);
+            var response = new RedirectResult("/");
+            this.SignInUser(username, request, response);
 
-            this.SignInUser(username, view, request);
-            
-            viewBag.Add("Username", username);
-
-            return View("Index", request, viewBag);
+            return response;
         }
 
         public IHttpResponse DoRegister(IHttpRequest request)
@@ -110,8 +111,15 @@ namespace IRunes.App.Controllers
 
         public IHttpResponse Logout(IHttpRequest request)
         {
-            this.LogoutUser(request);
-            return View("Index", request);
+            var response = new RedirectResult("/");
+
+            if (!this.IsAuthenticated(request))
+            {
+                return response;
+            }
+
+            this.LogoutUser(request, response);
+            return response;
         }
     }
 }

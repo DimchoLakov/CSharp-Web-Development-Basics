@@ -17,9 +17,10 @@ namespace IRunes.App.Controllers
         public IHttpResponse Index(IHttpRequest request)
         {
             var viewBag = new Dictionary<string, string>();
+            
             if (this.IsAuthenticated(request))
             {
-                var username = request.Session.GetParameter("username");
+                var username = this.GetUsername(request);
                 viewBag.Add("Username", username.ToString());
             }
             return View("Index", request, viewBag);
