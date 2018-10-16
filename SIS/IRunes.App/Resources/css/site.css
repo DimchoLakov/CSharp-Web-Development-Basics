@@ -2,6 +2,11 @@
     color: white;
 }
 
+u.username {
+    text-decoration: none;
+    color: orange;
+}
+
 a {
     color: orange;
 }

@@ -56,13 +56,13 @@ namespace IRunes.App.Controllers
 
             if (this.IsAuthenticated(request))
             {
-                layout = File.ReadAllText("Views/LoggedIn/_Layout.html");
-                content = File.ReadAllText("Views/LoggedIn/" + viewName + ".html");
+                layout = File.ReadAllText("../../../Views/LoggedIn/_Layout.html");
+                content = File.ReadAllText("../../../Views/LoggedIn/" + viewName + ".html");
             }
             else
             {
-                layout = File.ReadAllText("Views/LoggedOut/_Layout.html");
-                content = File.ReadAllText("Views/LoggedOut/" + viewName + ".html");
+                layout = File.ReadAllText("../../../Views/LoggedOut/_Layout.html");
+                content = File.ReadAllText("../../../Views/LoggedOut/" + viewName + ".html");
             }
 
             foreach (var item in viewBag)
