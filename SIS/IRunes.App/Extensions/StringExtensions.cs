@@ -8,5 +8,10 @@ namespace IRunes.App.Extensions
         {
             return WebUtility.UrlDecode(input);
         }
+
+        public static string DecodeHtml(this string input)
+        {
+            return WebUtility.HtmlDecode(input);
+        }
     }
 }

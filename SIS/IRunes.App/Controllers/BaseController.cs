@@ -84,6 +84,7 @@ namespace IRunes.App.Controllers
         public bool IsAuthenticated(IHttpRequest request)
         {
             return request.Session.ContainsParameter("username");
+
             //return request.Cookies.ContainsCookie(".auth-IRunes");
         }
 

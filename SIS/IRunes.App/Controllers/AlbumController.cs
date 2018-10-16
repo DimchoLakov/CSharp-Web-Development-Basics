@@ -52,8 +52,8 @@ namespace IRunes.App.Controllers
 
         public IHttpResponse DoCreateAlbum(IHttpRequest request)
         {
-            var albumName = request.FormData["name"].ToString();
-            var albumCover = request.FormData["cover"].ToString();
+            var albumName = request.FormData["name"].ToString().DecodeHtml();
+            var albumCover = request.FormData["cover"].ToString().DecodeUrl();
 
             var username = this.GetUsernameFromSession(request);
             var userId = this.dbContext.Users.FirstOrDefault(x => x.Username == username)?.Id;
@@ -102,19 +102,16 @@ namespace IRunes.App.Controllers
             }
 
             var sb = new StringBuilder();
-
-            sb.Append("<ol>");
-
+            
             var tracks = this.dbContext.AlbumTracks
                 .Where(x => x.AlbumId == albumId)
-                .Select(x => $"<strong><li><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\">{x.Track.Name}</a></li></strong>")
+                .Select(x => $"<li class=\"list-group-item\"><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\"><strong>{x.Track.Name}</strong></a></li>")
                 .ToArray();
 
             var tracksAsString = string.Join(string.Empty, tracks);
             var result = !string.IsNullOrWhiteSpace(tracksAsString) ? tracksAsString : "There are currently no tracks.";
 
             sb.Append(result);
-            sb.Append("</ol>");
 
             viewBag.Add("Cover", album.Cover.DecodeUrl());
             viewBag.Add("Name", album.Name);
@@ -142,8 +139,8 @@ namespace IRunes.App.Controllers
 
         public IHttpResponse DoCreateTrack(IHttpRequest request)
         {
-            var trackName = request.FormData["name"].ToString().Trim();
-            var link = request.FormData["link"].ToString().Trim();
+            var trackName = request.FormData["name"].ToString().Trim().DecodeHtml();
+            var link = request.FormData["link"].ToString().Trim().DecodeUrl();
             var priceAsString = request.FormData["price"].ToString().Trim();
 
             if (!decimal.TryParse(priceAsString, out decimal price))

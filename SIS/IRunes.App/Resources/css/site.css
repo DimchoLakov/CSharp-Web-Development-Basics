@@ -1,5 +1,5 @@
 ﻿body {
-    color: white;
+    background-color: white
 }
 
 u.username {
@@ -62,5 +62,5 @@ footer {
 
 .jumbotron {
     background-color: green;
+    color: white
 }
-
