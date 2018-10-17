@@ -107,7 +107,7 @@ namespace SIS.WebServer
 
             var fileContent = File.ReadAllBytes(resourcePath);
 
-            return new InlineResouceResult(fileContent, HttpResponseStatusCode.Ok);
+            return new InlineResourceResult(fileContent, HttpResponseStatusCode.Ok);
         }
 
         private bool IsResourceRequest(IHttpRequest httpRequest)

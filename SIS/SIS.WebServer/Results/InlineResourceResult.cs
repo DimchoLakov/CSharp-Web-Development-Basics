@@ -6,9 +6,9 @@ using SIS.HTTP.Responses;
 
 namespace SIS.WebServer.Results
 {
-    public class InlineResouceResult : HttpResponse
+    public class InlineResourceResult : HttpResponse
     {
-        public InlineResouceResult(byte[] content, HttpResponseStatusCode responseStatusCode)
+        public InlineResourceResult(byte[] content, HttpResponseStatusCode responseStatusCode)
             : base(responseStatusCode)
         {
             this.Headers.Add(new HttpHeader(HttpHeader.ContentLength, content.Length.ToString()));
