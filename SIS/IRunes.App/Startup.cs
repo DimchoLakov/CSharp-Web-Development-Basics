@@ -1,6 +1,9 @@
-﻿using IRunes.App.Controllers;
+﻿using System;
+using System.Reflection;
+using IRunes.App.Controllers;
 using SIS.HTTP.Enums;
 using SIS.WebServer;
+using SIS.WebServer.Api;
 using SIS.WebServer.Routing;
 
 namespace IRunes.App
@@ -31,7 +34,9 @@ namespace IRunes.App
             serverRoutingTable.Routes[HttpRequestMethod.Post]["/albums/create"] = request => new AlbumController().DoCreateAlbum(request);
             serverRoutingTable.Routes[HttpRequestMethod.Post]["/tracks/create"] = request => new AlbumController().DoCreateTrack(request);
 
-            var server = new Server(80, serverRoutingTable);
+            var httpHandler = new HttpHandler(serverRoutingTable);
+            var server = new Server(80, httpHandler);;
+
             server.Run();
         }
     }
