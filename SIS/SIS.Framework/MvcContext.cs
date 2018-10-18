@@ -6,13 +6,13 @@
 
         private MvcContext() { }
 
-        private static MvcContext Get => Instance ?? (Instance = new MvcContext());
+        public static MvcContext Get => Instance ?? (Instance = new MvcContext());
 
-        public string AssemblyType { get; set; }
+        public string AssemblyName { get; set; }
 
         public string ControllersFolder { get; set; }
 
-        public string ControllersSuffix { get; set; }
+        public string ControllerSuffix { get; set; }
 
         public string ViewsFolder { get; set; }
 
