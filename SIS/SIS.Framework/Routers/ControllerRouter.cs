@@ -108,7 +108,7 @@ namespace SIS.Framework.Routers
             {
                 var requestUrlSplit = request.Path.Split("/", StringSplitOptions.RemoveEmptyEntries);
                 controllerName = requestUrlSplit[0].Capitalize();
-                actionName = requestUrlSplit[0].Capitalize();
+                actionName = requestUrlSplit[1].Capitalize();
             }
 
             var controller = this.GetController(controllerName, request);
