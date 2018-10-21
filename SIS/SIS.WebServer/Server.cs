@@ -18,16 +18,16 @@ namespace SIS.WebServer
 
         private bool isRunning;
 
-        private readonly IHttpHandler httpHandler;
+        private readonly IHttpHandlingContext handlersContext;
 
         private readonly ServerRoutingTable serverRoutingTable;
         
-        public Server(int port, IHttpHandler handler)
+        public Server(int port, IHttpHandlingContext handler)
         {
             this.port = port;
             this.listener = new TcpListener(IPAddress.Parse(LocalhostIpAddress), port);
 
-            this.httpHandler = handler;
+            this.handlersContext = handler;
         }
 
         public Server(int port, ServerRoutingTable routingTable)
@@ -56,7 +56,7 @@ namespace SIS.WebServer
 
         public async void Listen(Socket client)
         {
-            var connectionHandler = new ConnectionHandler(client, this.httpHandler);
+            var connectionHandler = new ConnectionHandler(client, this.handlersContext);
             await connectionHandler.ProcessRequestAsync();
         }
     }

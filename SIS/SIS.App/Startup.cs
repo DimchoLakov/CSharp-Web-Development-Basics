@@ -8,7 +8,10 @@ namespace SIS.App
     {
         public static void Main()
         {
-            Server server = new Server(8000, new ControllerRouter());
+            var controllerRouter = new ControllerRouter();
+            var resourceRouter = new ResourceRouter();
+            var handlersContext = new HttpRouterHandlingContext(controllerRouter, resourceRouter);
+            Server server = new Server(8000, handlersContext);
             MvcEngine.Run(server);
         }
     }

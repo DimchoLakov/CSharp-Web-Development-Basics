@@ -23,19 +23,17 @@ namespace SIS.WebServer
     {
         private readonly Socket client;
 
-        private readonly IHttpHandler handler;
+        private readonly IHttpHandlingContext handlersContext;
 
         private const string RootDirectoryRelativePath = "../../..";
 
-        public ConnectionHandler(
-            Socket client,
-            IHttpHandler handler)
+        public ConnectionHandler(Socket client, IHttpHandlingContext handler)
         {
             CoreValidator.ThrowIfNull(client, nameof(client));
             CoreValidator.ThrowIfNull(handler, nameof(handler));
 
             this.client = client;
-            this.handler = handler;
+            this.handlersContext = handler;
         }
 
         private async Task<IHttpRequest> ReadRequest()
@@ -68,7 +66,7 @@ namespace SIS.WebServer
 
             return new HttpRequest(result.ToString());
         }
-        
+
         private async Task PrepareResponse(IHttpResponse httpResponse)
         {
             byte[] byteSegments = httpResponse.GetBytes();
@@ -115,7 +113,7 @@ namespace SIS.WebServer
                 {
                     string sessionId = this.SetRequestSession(httpRequest);
 
-                    var httpResponse = this.handler.Handle(httpRequest);
+                    var httpResponse = this.handlersContext.Handle(httpRequest);
 
                     this.SetResponseSession(httpResponse, sessionId);
 

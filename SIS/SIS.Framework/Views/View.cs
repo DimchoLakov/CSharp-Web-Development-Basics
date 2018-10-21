@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using SIS.Framework.ActionResults.Interfaces;
 
@@ -8,9 +9,12 @@ namespace SIS.Framework.Views
     {
         private readonly string fullyQualifiedTemplateName;
 
-        public View(string fullyQualifiedTemplateName)
+        private readonly IDictionary<string, object> viewData;
+
+        public View(string fullyQualifiedTemplateName, IDictionary<string, object> data)
         {
             this.fullyQualifiedTemplateName = fullyQualifiedTemplateName;
+            this.viewData = data;
         }
 
         private string ReadFile(string fullyQualifiedTemplateName)
@@ -28,8 +32,21 @@ namespace SIS.Framework.Views
         public string Render()
         {
             var fullHtml = this.ReadFile(this.fullyQualifiedTemplateName);
+            var renderedHtml = this.RenderHtml(fullHtml);
 
-            return fullHtml;
+            return renderedHtml;
+        }
+
+        private string RenderHtml(string fullHtml)
+        {
+            var renderedHtml = fullHtml;
+
+            foreach (var parameter in this.viewData)
+            {
+                renderedHtml = renderedHtml.Replace($"{{{{{{{parameter.Key}}}}}}}", parameter.Value.ToString());
+            }
+
+            return renderedHtml;
         }
     }
 }

@@ -17,5 +17,9 @@
         public string ViewsFolder { get; set; }
 
         public string ModelsFolder { get; set; }
+
+        public string RootDirectoryRelativePath { get; set; } = "../../..";
+
+        public string ResourceFolderName { get; set; } = "Resources";
     }
 }
