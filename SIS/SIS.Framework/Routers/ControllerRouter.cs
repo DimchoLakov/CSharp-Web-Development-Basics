@@ -6,6 +6,7 @@ using SIS.Framework.ActionResults.Interfaces;
 using SIS.Framework.Attributes.Methods;
 using SIS.Framework.Attributes.Properties;
 using SIS.Framework.Controllers;
+using SIS.Framework.Services;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Extensions;
 using SIS.HTTP.Requests;
@@ -19,13 +20,26 @@ namespace SIS.Framework.Routers
     {
         private const string UnsupportedActionMessage = "The view result is not supported.";
 
+        private readonly IDependencyContainer dependencyContainer;
+
+        public ControllerRouter(IDependencyContainer dependencyContainer)
+        {
+            this.dependencyContainer = dependencyContainer;
+        }
+
         private Controller GetController(string controllerName, IHttpRequest request)
         {
             if (controllerName != null)
             {
-                var controllerType = Assembly.GetEntryAssembly().GetTypes().FirstOrDefault(x => x.Name.ToLower() == controllerName.ToLower() + MvcContext.Get.ControllerSuffix.ToLower());
+                var controllerType = Assembly
+                    .GetEntryAssembly()
+                    .GetTypes()
+                    .FirstOrDefault
+                             (
+                                 x => x.Name.ToLower() == controllerName.ToLower() + MvcContext.Get.ControllerSuffix.ToLower()
+                             );
 
-                var controller = (Controller)Activator.CreateInstance(controllerType);
+                var controller = (Controller)this.dependencyContainer.CreateInstance(controllerType);
 
                 if (controller != null)
                 {
@@ -62,7 +76,7 @@ namespace SIS.Framework.Routers
                     }
                 }
             }
-            
+
             return action;
         }
 
