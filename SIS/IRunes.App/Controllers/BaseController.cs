@@ -2,6 +2,7 @@
 using System.IO;
 using IRunes.App.Services;
 using IRunes.App.Services.Interfaces;
+using SIS.Framework.Controllers;
 using SIS.HTTP.Cookies;
 using SIS.HTTP.Enums;
 using SIS.HTTP.Requests;
@@ -10,7 +11,7 @@ using SIS.WebServer.Results;
 
 namespace IRunes.App.Controllers
 {
-    public abstract class BaseController
+    public abstract class BaseController : Controller
     {
         private const string AuthKey = ".auth-IRunes";
         private const int CookieExpiryDays = 7;
@@ -51,7 +52,7 @@ namespace IRunes.App.Controllers
         {
             var viewBag = new Dictionary<string, string>();
             viewBag.Add("Error", errorMessage);
-            var allContent = this.GetViewContent("Error",request, viewBag);
+            var allContent = this.GetViewContent("Error", request, viewBag);
 
             return new HtmlResult(allContent, HttpResponseStatusCode.BadRequest);
         }

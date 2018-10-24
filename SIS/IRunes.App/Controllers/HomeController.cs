@@ -17,7 +17,7 @@ namespace IRunes.App.Controllers
         public IHttpResponse Index(IHttpRequest request)
         {
             var viewBag = new Dictionary<string, string>();
-            
+
             if (this.IsAuthenticated(request))
             {
                 var username = this.GetUsername(request);

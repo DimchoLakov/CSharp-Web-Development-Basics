@@ -1,5 +1,6 @@
 ﻿using SIS.Framework;
 using SIS.Framework.Routers;
+using SIS.Framework.Services;
 using SIS.WebServer;
 
 namespace SIS.App
@@ -8,9 +9,10 @@ namespace SIS.App
     {
         public static void Main()
         {
-            var controllerRouter = new ControllerRouter();
-            var resourceRouter = new ResourceRouter();
-            var handlersContext = new HttpRouterHandlingContext(controllerRouter, resourceRouter);
+            var dependencyContainer = new DependencyContainer();
+
+            var controllerRouter = new ControllerRouter(dependencyContainer);
+            var handlersContext = new HttpRouterHandlingContext(controllerRouter, new ResourceRouter());
             Server server = new Server(8000, handlersContext);
             MvcEngine.Run(server);
         }

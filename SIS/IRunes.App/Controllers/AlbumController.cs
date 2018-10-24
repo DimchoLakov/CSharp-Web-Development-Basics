@@ -102,7 +102,7 @@ namespace IRunes.App.Controllers
             }
 
             var sb = new StringBuilder();
-            
+
             var tracks = this.dbContext.AlbumTracks
                 .Where(x => x.AlbumId == albumId)
                 .Select(x => $"<li class=\"list-group-item\"><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\"><strong>{x.Track.Name}</strong></a></li>")
