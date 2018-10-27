@@ -13,7 +13,7 @@ namespace SIS.App
 
             var controllerRouter = new ControllerRouter(dependencyContainer);
             var handlersContext = new HttpRouterHandlingContext(controllerRouter, new ResourceRouter());
-            Server server = new Server(8000, handlersContext);
+            Server server = new Server(80, handlersContext);
             MvcEngine.Run(server);
         }
     }

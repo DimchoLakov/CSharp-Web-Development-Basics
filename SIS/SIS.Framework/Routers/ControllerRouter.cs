@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using SIS.Framework.ActionResults.Interfaces;
+using SIS.Framework.Attributes.Action;
 using SIS.Framework.Attributes.Methods;
 using SIS.Framework.Attributes.Properties;
 using SIS.Framework.Controllers;
@@ -138,7 +139,8 @@ namespace SIS.Framework.Routers
             object[] actionParameters = this.MapActionParameters(controller, action, request);
 
             IActionResult actionResult = this.InvokeAction(controller, action, actionParameters);
-            return this.PrepareResponse(actionResult);
+
+            return this.Authorize(controller, action) ?? this.PrepareResponse(actionResult);
         }
 
         private IActionResult InvokeAction(Controller controller, MethodInfo action, object[] actionParameters)
@@ -230,6 +232,20 @@ namespace SIS.Framework.Routers
             if (request.FormData.ContainsKey(key))
             {
                 return request.FormData[key];
+            }
+
+            return null;
+        }
+
+        private IHttpResponse Authorize(Controller controller, MethodInfo action)
+        {
+            if (action
+                .GetCustomAttributes()
+                .Where(a => a is AuthorizeAttribute)
+                .Cast<AuthorizeAttribute>()
+                .Any(a => !a.IsAuthorized(controller.Identity)))
+            {
+                return new UnauthorizedResult();
             }
 
             return null;
