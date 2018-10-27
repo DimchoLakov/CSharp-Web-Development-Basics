@@ -12,7 +12,7 @@ namespace SIS.Demo
 
             serverRoutingTable.Routes[HttpRequestMethod.Get]["/"] = request => new HomeController().Index();
 
-            Server server = new Server(8000, serverRoutingTable);
+            Server server = new Server(80, serverRoutingTable);
 
             server.Run();
         }
