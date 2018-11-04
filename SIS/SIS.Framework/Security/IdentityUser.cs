@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using SIS.Framework.Security.Interfaces;
 
-namespace SIS.Framework.Security.Interfaces
+namespace SIS.Framework.Security
 {
     public class IdentityUser : IdentityUser<string>
     {
