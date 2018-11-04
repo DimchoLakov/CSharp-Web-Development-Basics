@@ -1,25 +1,23 @@
-﻿namespace SIS.Framework
+﻿using System.Reflection;
+
+namespace SIS.Framework
 {
     public class MvcContext
     {
-        private static MvcContext Instance;
+        private static MvcContext instance;
 
         private MvcContext() { }
 
-        public static MvcContext Get => Instance ?? (Instance = new MvcContext());
+        public static MvcContext Get => instance ?? (instance = new MvcContext());
 
-        public string AssemblyName { get; set; }
+        public string AssemblyName { get; set; } = Assembly.GetEntryAssembly().GetName().Name;
 
-        public string ControllersFolder { get; set; }
+        public string ControllerFolder { get; set; } = "Controllers";
 
-        public string ControllerSuffix { get; set; }
+        public string ControllersSuffix { get; set; } = "Controller";
 
-        public string ViewsFolder { get; set; }
+        public string ViewsFolder { get; set; } = "Views";
 
-        public string ModelsFolder { get; set; }
-
-        public string RootDirectoryRelativePath { get; set; } = "../../..";
-
-        public string ResourceFolderName { get; set; } = "Resources";
+        public string ModelsFolder { get; set; } = "Models";
     }
 }

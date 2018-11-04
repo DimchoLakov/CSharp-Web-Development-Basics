@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SIS.Framework.Security.Interfaces;
 
 namespace SIS.Framework.Security
 {
@@ -12,8 +11,7 @@ namespace SIS.Framework.Security
         }
     }
 
-    public class IdentityUser<TKey> : IIdentity
-        where TKey : IEquatable<TKey>
+    public class IdentityUser<TKey> : IIdentity where TKey : IEquatable<TKey>
     {
         public virtual TKey Id { get; set; }
 

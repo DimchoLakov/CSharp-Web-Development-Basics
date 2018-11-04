@@ -20,14 +20,11 @@ namespace SIS.Framework.Views
 
         private const string ModelCollectionViewParameterPattern = @"\@Model\.Collection\.(\w+)\((.+)\)";
 
-        private string ViewFolderPath
-            => $@"{ViewPathPrefix}\{MvcContext.Get.ViewsFolder}\";
+        private string ViewsFolderPath => $@"{ViewPathPrefix}\{MvcContext.Get.ViewsFolder}\";
 
-        private string ViewsSharedFolderPath
-            => $@"{this.ViewFolderPath}Shared\";
+        private string ViewsSharedFolderPath => $@"{this.ViewsFolderPath}Shared\";
 
-        private string ViewDisplayTemplateFolderPath
-            => $@"{this.ViewsSharedFolderPath}\DisplayTemplates\";
+        private string ViewsDisplayTemplateFolderPath => $@"{this.ViewsSharedFolderPath}\DisplayTemplates\";
 
         private string FormatLayoutViewPath()
             => $@"{this.ViewsSharedFolderPath}{LayoutViewName}.{ViewExtension}";
@@ -36,16 +33,16 @@ namespace SIS.Framework.Views
             => $@"{this.ViewsSharedFolderPath}{ErrorViewName}.{ViewExtension}";
 
         private string FormatViewPath(string controllerName, string actionName)
-            => $@"{this.ViewFolderPath}\{controllerName}\{actionName}.{ViewExtension}";
+            => $@"{this.ViewsFolderPath}\{controllerName}\{actionName}.{ViewExtension}";
 
         private string FormatDisplayTemplatePath(string objectName)
-            => $@"{this.ViewDisplayTemplateFolderPath}{objectName}{DisplayTemplateSuffix}.{ViewExtension}";
+            => $@"{this.ViewsDisplayTemplateFolderPath}{objectName}{DisplayTemplateSuffix}.{ViewExtension}";
 
         private string ReadLayoutHtml(string layoutViewPath)
         {
             if (!File.Exists(layoutViewPath))
             {
-                throw new FileNotFoundException("Layout View does not exist.");
+                throw new FileNotFoundException($"Layout View does not exist.");
             }
 
             return File.ReadAllText(layoutViewPath);
@@ -55,7 +52,7 @@ namespace SIS.Framework.Views
         {
             if (!File.Exists(errorViewPath))
             {
-                throw new FileNotFoundException("Error View does not exist.");
+                throw new FileNotFoundException($"Error View does not exist.");
             }
 
             return File.ReadAllText(errorViewPath);
@@ -65,7 +62,7 @@ namespace SIS.Framework.Views
         {
             if (!File.Exists(viewPath))
             {
-                throw new FileNotFoundException($"View does not exist at {viewPath}.");
+                throw new FileNotFoundException($"View does not exist at {viewPath}");
             }
 
             return File.ReadAllText(viewPath);
@@ -73,35 +70,39 @@ namespace SIS.Framework.Views
 
         private string RenderObject(object viewObject, string displayTemplate)
         {
-            var objectProperties = viewObject.GetType().GetProperties();
-
-            foreach (var property in objectProperties)
+            foreach (var property in viewObject.GetType().GetProperties())
             {
                 displayTemplate =
-                    this.RenderViewData(displayTemplate, property.GetValue(viewObject), property.Name);
+                    this.RenderViewData(displayTemplate
+                        , property.GetValue(viewObject)
+                        , property.Name);
             }
 
             return displayTemplate;
         }
 
-        private string RenderViewData(string template, object viewObject, string viewObjectName = null)
+        private string RenderViewData(string template
+            , object viewObject
+            , string viewObjectName = null)
         {
             if (viewObject != null
-                && viewObject.GetType() != typeof(string) 
+                && viewObject.GetType() != typeof(string)
                 && viewObject is IEnumerable enumerable
                 && Regex.IsMatch(template, ModelCollectionViewParameterPattern))
             {
-                Match collectionMatch = Regex.Matches(template, ModelCollectionViewParameterPattern)
-                    .First(m => m.Groups[1].Value == viewObjectName);
+                Match collectionMatch =
+                    Regex.Matches(template, ModelCollectionViewParameterPattern)
+                    .First(cm => cm.Groups[1].Value == viewObjectName);
 
-                var fullMatch = collectionMatch.Groups[0].Value;
-                var itemPattern = collectionMatch.Groups[2].Value;
+                string fullMatch = collectionMatch.Groups[0].Value;
+                string itemPattern = collectionMatch.Groups[2].Value;
 
                 string result = string.Empty;
 
-                foreach (var element in enumerable)
+                foreach (var subObject in enumerable)
                 {
-                    result += itemPattern.Replace("@Item", this.RenderViewData(template, element));
+                    result += itemPattern
+                        .Replace("@Item", this.RenderViewData(template, subObject));
                 }
 
                 return template.Replace(fullMatch, result);
@@ -111,15 +112,14 @@ namespace SIS.Framework.Views
                 && !viewObject.GetType().IsPrimitive
                 && viewObject.GetType() != typeof(string))
             {
-                var objectDisplayTemplate = this.FormatDisplayTemplatePath(viewObject.GetType().Name);
-                if (File.Exists(objectDisplayTemplate))
+                if (File.Exists(this.FormatDisplayTemplatePath(viewObject.GetType().Name)))
                 {
                     string renderedObject = this.RenderObject(viewObject,
-                        File.ReadAllText(objectDisplayTemplate));
+                        File.ReadAllText(this.FormatDisplayTemplatePath(viewObject.GetType().Name)));
 
                     return viewObjectName != null
-                        ? template.Replace($"@Model.{viewObjectName}", renderedObject)
-                        : renderedObject;
+                           ? template.Replace($"@Model.{viewObjectName}", renderedObject)
+                           : renderedObject;
                 }
             }
 
@@ -138,13 +138,14 @@ namespace SIS.Framework.Views
 
         public string RenderHtml(string fullHtmlContent, IDictionary<string, object> viewData)
         {
-            var renderedHtml = fullHtmlContent;
+            string renderedHtml = fullHtmlContent;
 
             if (viewData.Count > 0)
             {
                 foreach (var parameter in viewData)
                 {
-                    renderedHtml = this.RenderViewData(renderedHtml, parameter.Value, parameter.Key);
+                    renderedHtml = 
+                        this.RenderViewData(renderedHtml, parameter.Value, parameter.Key);
                 }
             }
 

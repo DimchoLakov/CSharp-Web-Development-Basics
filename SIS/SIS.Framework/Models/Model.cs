@@ -6,8 +6,8 @@
 
         public bool? IsValid
         {
-            get { return this.isValid; }
-            set { this.isValid = this.isValid ?? value; }
+            get => this.isValid;
+            set => this.isValid = this.isValid ?? value;
         }
     }
 }

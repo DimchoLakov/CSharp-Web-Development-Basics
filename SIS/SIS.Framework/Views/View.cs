@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using SIS.Framework.ActionResults.Interfaces;
+using System.IO;
+using System.Linq;
+using SIS.Framework.ActionResults;
 
 namespace SIS.Framework.Views
 {
@@ -11,10 +13,7 @@ namespace SIS.Framework.Views
         {
             this.fullHtmlContent = fullHtmlContent;
         }
-        
-        public string Render()
-        {
-            return this.fullHtmlContent;
-        }
+
+        public string Render() => this.fullHtmlContent;
     }
 }

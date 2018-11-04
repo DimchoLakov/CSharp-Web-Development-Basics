@@ -6,12 +6,12 @@ using SIS.HTTP.Responses;
 
 namespace SIS.WebServer.Results
 {
-    public class BadRequestResult : HttpResponse
+    public class InternalServerErrorResult : HttpResponse
     {
-        private const string DefaultErrorHeading = "<h1>Error of type occured, see details</h1>";
+        private const string DefaultErrorHeading = "<h1>Internal Server Error occured, see details</h1>";
 
-        public BadRequestResult(string content)
-            : base(HttpResponseStatusCode.BadRequest)
+        public InternalServerErrorResult(string content)
+            : base(HttpResponseStatusCode.InternalServerError)
         {
             content = DefaultErrorHeading + Environment.NewLine + content;
             this.Headers.Add(new HttpHeader(HttpHeader.ContentType, "text/html"));

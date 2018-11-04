@@ -1,4 +1,4 @@
-﻿namespace SIS.Framework.ActionResults.Interfaces
+﻿namespace SIS.Framework.ActionResults
 {
     public interface IRenderable
     {

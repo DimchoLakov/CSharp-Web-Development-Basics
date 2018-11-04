@@ -52,7 +52,7 @@ namespace SIS.HTTP.Responses
             StringBuilder result = new StringBuilder();
 
             result
-                .Append($"{GlobalConstants.HttpOneProtocolFragment} {(int)this.StatusCode} {this.StatusCode.ToString()}").Append(GlobalConstants.HttpNewLine)
+                .Append($"{GlobalConstants.HttpOneProtocolFragment} {this.StatusCode.GetResponseLine()}").Append(GlobalConstants.HttpNewLine)
                 .Append(this.Headers).Append(GlobalConstants.HttpNewLine);
 
             if (this.Cookies.HasCookies())

@@ -9,12 +9,12 @@ namespace SIS.Framework.Models
             this.Data = new Dictionary<string, object>();
         }
 
-        public Dictionary<string, object> Data { get; set; }
+        public IDictionary<string, object> Data { get; }
 
         public object this[string key]
         {
-            get { return this.Data[key];}
-            set { this.Data[key] = value; }
+            get => this.Data[key];
+            set => this.Data[key] = value;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using SIS.Framework.Services;
 
-namespace SIS.Framework.Api.Interfaces
+namespace SIS.Framework.Api
 {
     public interface IMvcApplication
     {
@@ -9,3 +9,4 @@ namespace SIS.Framework.Api.Interfaces
         void ConfigureServices(IDependencyContainer dependencyContainer);
     }
 }
+

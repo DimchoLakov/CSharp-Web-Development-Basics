@@ -14,33 +14,30 @@ namespace SIS.Framework.Services
             this.dependencyDictionary = new Dictionary<Type, Type>();
         }
 
-        private Type this[Type key]
+        private Type this[Type key] 
+            => this.dependencyDictionary.ContainsKey(key) ? this.dependencyDictionary[key] : null;
+
+        public void RegisterDependency<TSource, TDestination>()
         {
-            get
-            {
-                return this.dependencyDictionary.ContainsKey(key) ? this.dependencyDictionary[key] : null;
-            }
+            this.dependencyDictionary[typeof(TSource)] = typeof(TDestination);
         }
 
-        public T CreateInstance<T>()
-        {
-            return (T)CreateInstance(typeof(T));
-        }
+        public T CreateInstance<T>() 
+            => (T) this.CreateInstance(typeof(T));
 
         public object CreateInstance(Type type)
         {
+            if (type == null) return null;
+
             Type instanceType = this[type] ?? type;
 
             if (instanceType.IsInterface || instanceType.IsAbstract)
             {
-                throw new InvalidOperationException($"Type {type.FullName} cannot be instantiated.");
+                throw new InvalidOperationException($"Type {instanceType.FullName} cannot be instantiated.");
             }
 
-            ConstructorInfo constructor = instanceType
-                .GetConstructors()
-                .OrderByDescending(x => x.GetParameters().Length)
-                .First();
-
+            ConstructorInfo constructor =
+                instanceType.GetConstructors().OrderBy(x => x.GetParameters().Length).First();
             ParameterInfo[] constructorParameters = constructor.GetParameters();
             object[] constructorParameterObjects = new object[constructorParameters.Length];
 
@@ -50,11 +47,6 @@ namespace SIS.Framework.Services
             }
 
             return constructor.Invoke(constructorParameterObjects);
-        }
-
-        public void RegisterDependency<TSource, TDestination>()
-        {
-            this.dependencyDictionary[typeof(TSource)] = typeof(TDestination);
         }
     }
 }

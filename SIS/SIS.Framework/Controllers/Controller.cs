@@ -1,40 +1,33 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.CompilerServices;
 using SIS.Framework.ActionResults;
-using SIS.Framework.ActionResults.Interfaces;
+using SIS.Framework.ActionResults.Implementations;
 using SIS.Framework.Models;
-using SIS.Framework.Security.Interfaces;
+using SIS.Framework.Security;
 using SIS.Framework.Utilities;
 using SIS.Framework.Views;
 using SIS.HTTP.Requests;
 
 namespace SIS.Framework.Controllers
 {
-    public abstract class Controller
+    public class Controller
     {
-        private const string SessionParameterAuth = "auth";
+        private ViewEngine ViewEngine { get; } = new ViewEngine();
 
-        protected Controller()
-        {
-            this.Model = new ViewModel();
-            this.ModelState = new Model();
-        }
-
-        public ViewModel Model { get; set; }
+        protected ViewModel Model { get; } = new ViewModel();
 
         public IHttpRequest Request { get; set; }
 
-        public Model ModelState { get; set; }
+        public IIdentity Identity 
+            => this.Request.Session.ContainsParameter("auth")
+                ? (IIdentity)this.Request.Session.GetParameter("auth")
+                : null;
 
-        public IIdentity Identity
-            => (IIdentity)this.Request.Session.GetParameter(SessionParameterAuth);
+        public Model ModelState { get; } = new Model();
 
-        private ViewEngine ViewEngine { get; } = new ViewEngine();
-
-        protected IViewable View([CallerMemberName] string actionName = "")
+        protected virtual IViewable View([CallerMemberName] string actionName = "")
         {
-            var controllerName = ControllerUtilities.GetControllerName(this);
+            string controllerName = ControllerUtilities.GetControllerName(this);
             string viewContent = null;
 
             try
@@ -48,28 +41,21 @@ namespace SIS.Framework.Controllers
                 viewContent = this.ViewEngine.GetErrorContent();
             }
 
-            var renderedContent = this.ViewEngine.RenderHtml(viewContent, this.Model.Data);
+            string renderedContent = this.ViewEngine.RenderHtml(viewContent, this.Model.Data);
             return new ViewResult(new View(renderedContent));
         }
 
         protected IRedirectable RedirectToAction(string redirectUrl)
+            => new RedirectResult(redirectUrl);
+
+        protected void SignIn(IIdentity auth)
         {
-            return new RedirectResult(redirectUrl);
+            this.Request.Session.AddParameter("auth", auth);
         }
 
-        public void SignIn(IIdentity auth)
-        {
-            this.Request.Session.AddParameter(SessionParameterAuth, auth);
-        }
-
-        public void SignOut()
+        protected void SignOut()
         {
             this.Request.Session.ClearParameters();
-        }
-
-        public bool IsSignedIn()
-        {
-            return this.Identity != null;
         }
     }
 }

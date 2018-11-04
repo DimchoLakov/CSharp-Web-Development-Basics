@@ -1,6 +1,4 @@
-﻿using SIS.Framework.ActionResults.Interfaces;
-
-namespace SIS.Framework.ActionResults
+﻿namespace SIS.Framework.ActionResults.Implementations
 {
     public class RedirectResult : IRedirectable
     {
@@ -9,11 +7,8 @@ namespace SIS.Framework.ActionResults
             this.RedirectUrl = redirectUrl;
         }
 
-        public string Invoke()
-        {
-            return this.RedirectUrl;
-        }
-
         public string RedirectUrl { get; }
+
+        public string Invoke() => this.RedirectUrl;
     }
 }

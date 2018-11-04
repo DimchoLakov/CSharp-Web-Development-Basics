@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SIS.Framework.Security.Interfaces
+namespace SIS.Framework.Security
 {
     public interface IIdentity
     {

@@ -1,6 +1,4 @@
-﻿using SIS.Framework.ActionResults.Interfaces;
-
-namespace SIS.Framework.ActionResults
+﻿namespace SIS.Framework.ActionResults.Implementations
 {
     public class ViewResult : IViewable
     {
@@ -9,11 +7,8 @@ namespace SIS.Framework.ActionResults
             this.View = view;
         }
 
-        public string Invoke()
-        {
-            return this.View.Render();
-        }
-
         public IRenderable View { get; set; }
+
+        public string Invoke() => this.View.Render();
     }
 }
