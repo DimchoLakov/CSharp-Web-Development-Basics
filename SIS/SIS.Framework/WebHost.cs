@@ -9,7 +9,7 @@ namespace SIS.Framework
 {
     public static class WebHost
     {
-        private const int HostingPort = 8000; 
+        private const int HostingPort = 80; 
 
         public static void Start(IMvcApplication application)
         {
