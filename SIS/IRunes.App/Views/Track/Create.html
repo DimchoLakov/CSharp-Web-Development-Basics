@@ -1,14 +1,18 @@
 ﻿<div class="container w-50">
-    <h1>Create Album</h1>
+    <h1>Create Track</h1>
     <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
-    <form action="/album/create" method="post">
+    <form action="/track/create?albumId=@Model.AlbumId" method="post">
         <div class="form-group">
             <label for="name">Name</label>
             <input class="form-control" type="text" name="name" placeholder="Name..." required="true"/>
         </div>
         <div class="form-group">
-            <label for="cover">Cover</label>
-            <input class="form-control" type="url" name="cover" placeholder="Cover..." required="true"/>
+            <label for="link">Link</label>
+            <input class="form-control" type="url" name="link" placeholder="Link..." required="true"/>
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input class="form-control" type="text" name="price" placeholder="Price..." required="true"/>
         </div>
         <div class="row text-center">
             <div class="col-sm-6">
@@ -17,7 +21,7 @@
                 </div>
             </div>
             <div class="col-sm-6">
-                <a class="btn btn-success" href="/album/all"><i class="fas fa-chevron-left"></i> Back To All</a>
+                <a class="btn btn-success" href="/album/details?albumId=@Model.AlbumId"><i class="fas fa-chevron-left"></i> Back To Album</a>
             </div>
         </div>
     </form>

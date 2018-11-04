@@ -1,6 +1,7 @@
 ﻿using SIS.Framework.ActionResults.Interfaces;
 using SIS.Framework.Attributes.Action;
 using SIS.Framework.Controllers;
+using SIS.Framework.Security;
 using SIS.Framework.Security.Interfaces;
 
 namespace SIS.App.Controllers

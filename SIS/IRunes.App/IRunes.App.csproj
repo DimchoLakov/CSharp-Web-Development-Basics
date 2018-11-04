@@ -114,6 +114,9 @@
     <None Update="Views\LoggedOut\_Layout.html">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="Views\Shared\_Layout.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties Resources_4css_4bootstrap-reboot_1min_1css_1map__JSONSchema="" /></VisualStudio></ProjectExtensions>

@@ -1,111 +1,100 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using IRunes.App.Extensions;
-using IRunes.Data;
+using IRunes.App.ViewModels;
 using IRunes.Models;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
+using SIS.Framework.ActionResults.Interfaces;
+using SIS.Framework.Attributes.Action;
+using SIS.Framework.Attributes.Methods;
 
 namespace IRunes.App.Controllers
 {
     public class AlbumController : BaseController
     {
-        private IRunesDbContext dbContext;
-        private Dictionary<string, string> viewBag;
-
-        public AlbumController()
+        [Authorize]
+        [HttpGet("album/all")]
+        public IActionResult All()
         {
-            this.dbContext = new IRunesDbContext();
-            this.viewBag = new Dictionary<string, string>();
-        }
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
 
-        public IHttpResponse ShowAlbums(IHttpRequest request)
-        {
-            if (!this.IsAuthenticated(request))
+            var albums = this.DbContext.Albums.ToArray();
+
+            if (albums.Any())
             {
-                return View("Index", request);
+                var listOfAlbums = string.Empty;
+                foreach (var album in albums)
+                {
+                    var albumHtml = $@"<p><a href=""/album/details?albumId={album.Id}"">{album.Name}</a></p>";
+                    listOfAlbums += albumHtml;
+                }
+                this.Model["Albums"] = listOfAlbums;
+            }
+            else
+            {
+                this.Model["Albums"] = "There are currently no albums.";
             }
 
-            var albums = this.dbContext
-                .Albums
-                .Select(a => $"<a href=\"/albums/details?id={a.Id}\">{a.Name}</a><br />")
-                .ToArray();
-
-            var albumsToString = string.Join(string.Empty, albums);
-            var result = !string.IsNullOrWhiteSpace(albumsToString) ? albumsToString : "There are currently no albums.";
-
-            viewBag.Add("Albums", result);
-
-            return View("AllAlbums", request, viewBag);
+            return this.View();
         }
 
-        public IHttpResponse CreateAlbum(IHttpRequest request)
+        [Authorize]
+        [HttpGet("album/create")]
+        public IActionResult Create()
         {
-            if (!this.IsAuthenticated(request))
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (!this.IsSignedIn())
             {
-                return View("Index", request);
+                return this.RedirectToAction("/");
             }
-            return View("AlbumCreate", request);
+            return this.View();
         }
 
-        public IHttpResponse DoCreateAlbum(IHttpRequest request)
+        [HttpPost("album/create")]
+        public IActionResult DoCreate(CreateAlbumViewModel viewModel)
         {
-            var albumName = request.FormData["name"].ToString().DecodeHtml();
-            var albumCover = request.FormData["cover"].ToString().DecodeUrl();
-
-            var username = this.GetUsernameFromSession(request);
-            var userId = this.dbContext.Users.FirstOrDefault(x => x.Username == username)?.Id;
-            if (userId == null || !this.IsAuthenticated(request))
-            {
-                return View("Index", request);
-            }
-
+            var user = this.DbContext
+                .Users
+                .FirstOrDefault(x => x.Username == this.Identity.Username &&
+                                     x.Password == this.Identity.Password);
+            
             var album = new Album()
             {
-                Name = albumName,
-                Cover = albumCover,
-                UserId = userId
+                Name = viewModel.Name,
+                Cover = viewModel.Cover,
+                User = user,
+                UserId = user.Id
             };
 
-            this.dbContext.Albums.Add(album);
+            this.DbContext
+                .Albums
+                .Add(album);
 
-            try
-            {
-                this.dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                return this.BadRequestError(e.Message, request);
-            }
+            this.DbContext
+                .SaveChanges();
 
-            return this.ShowAlbums(request);
+            return this.All();
         }
 
-        public IHttpResponse AlbumDetails(IHttpRequest request)
+        [Authorize]
+        [HttpGet("album/details")]
+        public IActionResult Details(AlbumDetailsViewModel viewModel)
         {
-            var albumId = string.Empty;
-            try
-            {
-                albumId = request.QueryData["id"].ToString();
-            }
-            catch (Exception)
-            {
-                albumId = request.QueryData["albumDetailsId"].ToString();
-            }
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
 
-            var album = this.dbContext.Albums.FirstOrDefault(x => x.Id == albumId);
-            if (album == null || !this.IsAuthenticated(request))
-            {
-                return View("Index", request);
-            }
+            var albumId = viewModel.AlbumId;
 
             var sb = new StringBuilder();
 
-            var tracks = this.dbContext.AlbumTracks
+            var album = this.DbContext.Albums.FirstOrDefault(x => x.Id == albumId);
+            if (album == null || !this.IsSignedIn())
+            {
+                return this.RedirectToAction("/");
+            }
+
+            var tracks = this.DbContext
+                .AlbumTracks
                 .Where(x => x.AlbumId == albumId)
-                .Select(x => $"<li class=\"list-group-item\"><a href=\"/tracks/details?albumId={albumId}&trackId={x.Track.Id}\"><strong>{x.Track.Name}</strong></a></li>")
+                .Select(x => $"<li class=\"list-group-item\"><a href=\"/track/details?albumId={albumId}&trackId={x.Track.Id}\"><strong>{x.Track.Name}</strong></a></li>")
                 .ToArray();
 
             var tracksAsString = string.Join(string.Empty, tracks);
@@ -113,93 +102,12 @@ namespace IRunes.App.Controllers
 
             sb.Append(result);
 
-            viewBag.Add("Cover", album.Cover.DecodeUrl());
-            viewBag.Add("Name", album.Name);
-            viewBag.Add("Price", "$" + album.Price.ToString("f2"));
-            viewBag.Add("AlbumId", albumId);
-            viewBag.Add("Tracks", sb.ToString());
-
-            return View("AlbumDetails", request, viewBag);
-        }
-
-        public IHttpResponse CreateTrack(IHttpRequest request)
-        {
-            if (!this.IsAuthenticated(request))
-            {
-                return View("Index", request);
-            }
-
-            var albumId = request.QueryData["albumId"].ToString();
-
-            this.viewBag.Add("AlbumId", albumId);
-            this.viewBag.Add("AlbId", albumId);
-
-            return View("TrackCreate", request, viewBag);
-        }
-
-        public IHttpResponse DoCreateTrack(IHttpRequest request)
-        {
-            var trackName = request.FormData["name"].ToString().Trim().DecodeHtml();
-            var link = request.FormData["link"].ToString().Trim().DecodeUrl();
-            var priceAsString = request.FormData["price"].ToString().Trim();
-
-            if (!decimal.TryParse(priceAsString, out decimal price))
-            {
-                return View("TrackCreate", request);
-            }
-
-            var track = new Track()
-            {
-                Name = trackName,
-                Link = link,
-                Price = price
-            };
-
-            var albumId = request.QueryData["albumId"].ToString();
-            var albumTrack = new AlbumTrack()
-            {
-                Track = track,
-                AlbumId = albumId
-            };
-
-            this.dbContext.AlbumTracks.Add(albumTrack);
-
-            try
-            {
-                this.dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                return this.ServerError(e.Message, request);
-            }
-
-            request.QueryData["albumDetailsId"] = albumId;
-
-            return this.AlbumDetails(request);
-        }
-
-        public IHttpResponse TrackDetails(IHttpRequest request)
-        {
-            var trackId = request.QueryData["trackId"].ToString();
-            var albumId = request.QueryData["albumId"].ToString();
-
-            var track = this.dbContext.Tracks.FirstOrDefault(x => x.Id == trackId);
-
-            if (track == null)
-            {
-                request.QueryData["albumDetailsId"] = albumId;
-                return View("AlbumDetails", request);
-            }
-
-            var decodedLink = track.Link.DecodeUrl();
-            decodedLink = decodedLink.Replace("watch?v=", "embed/");
-
-            viewBag.Add("Link", decodedLink + "/");
-            viewBag.Add("Name", track.Name);
-            viewBag.Add("Price", "$" + track.Price.ToString("f2"));
-            viewBag.Add("BackToAlbum", albumId);
-
-            return View("TrackDetails", request, viewBag);
+            this.Model.Data.Add("Cover", album.Cover.DecodeUrl());
+            this.Model.Data.Add("Name", album.Name);
+            this.Model.Data.Add("Price", "$" + album.Price.ToString("f2"));
+            this.Model.Data.Add("AlbumId", albumId);
+            this.Model.Data.Add("Tracks", sb.ToString());
+            return this.View();
         }
     }
 }

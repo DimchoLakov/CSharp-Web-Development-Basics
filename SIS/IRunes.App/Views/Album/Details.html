@@ -1,0 +1,38 @@
+﻿<div class="form-row">
+    <div class="col-sm-5 text-center">
+        <div class="col-sm">
+            <div>
+                <img class="img-fluid" src="@Model.Cover" alt="Album Cover" />
+            </div>
+            <div>
+                <strong>Album Name: @Model.Name</strong>
+            </div>
+            <div>
+                <strong>Album Price: @Model.Price</strong>
+            </div>
+            <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <a href="/track/create?albumId=@Model.AlbumId" class="btn btn-success"><i class="fas fa-plus"></i> Create Track</a>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="/album/all" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back To All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-7">
+        <div class="col-sm">
+            <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+            <h2>
+                <strong>Tracks</strong>
+            </h2>
+            <ol class="list-group">
+                @Model.Tracks
+            </ol>
+            <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+        </div>
+    </div>
+</div>

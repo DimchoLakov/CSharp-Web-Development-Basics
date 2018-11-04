@@ -1,125 +1,120 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using IRunes.App.Services;
+﻿using System.Linq;
 using IRunes.App.Services.Interfaces;
-using IRunes.Data;
+using IRunes.App.ViewModels;
 using IRunes.Models;
-using SIS.HTTP.Cookies;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
-using SIS.WebServer.Results;
+using SIS.Framework.ActionResults.Interfaces;
+using SIS.Framework.Attributes.Methods;
+using SIS.Framework.Security;
 
 namespace IRunes.App.Controllers
 {
     public class UserController : BaseController
     {
-        private const string AuthKey = ".auth-IRunes";
+        private readonly IHashService hashService;
 
-        private IHashService hashService;
-        private IRunesDbContext dbContext;
-        private Dictionary<string, string> viewBag;
-
-        public UserController()
+        public UserController(IHashService hashService)
         {
-            this.hashService = new HashService();
-            this.dbContext = new IRunesDbContext();
-            this.viewBag = new Dictionary<string, string>();
+            this.hashService = hashService;
         }
 
-        public IHttpResponse Login(IHttpRequest request)
+        [HttpGet("/user/login")]
+        public IActionResult Login()
         {
-            if (this.IsAuthenticated(request))
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (this.IsSignedIn())
             {
-                var username = this.GetUsernameFromSession(request);
-                this.viewBag.Add("Username", username);
-                return View("Index", request, viewBag);
+                return this.RedirectToAction("/");
             }
-            return View("Login", request);
+            return this.View();
         }
-
-        public IHttpResponse Register(IHttpRequest request)
+        
+        [HttpPost("/user/login")]
+        public IActionResult DoLogin(LoginViewModel loginViewModel)
         {
-            if (this.IsAuthenticated(request))
+            if (this.IsSignedIn())
             {
-                return View("Index", request);
-            }
-            return View("Register", request);
-        }
-
-        public IHttpResponse DoLogin(IHttpRequest request)
-        {
-            var username = request.FormData["username"].ToString().Trim();
-            var password = request.FormData["password"].ToString();
-
-            var hashedPassword = this.hashService.ComputeSha256Hash(password);
-
-            if (this.IsAuthenticated(request))
-            {
-                return new RedirectResult("/");
+                return this.RedirectToAction("/");
             }
 
-            var user = this.dbContext.Users.FirstOrDefault(x => x.Username == username && x.Password == hashedPassword);
+            var hashedPassword = this.hashService.ComputeSha256Hash(loginViewModel.Password);
+
+            var user = this.DbContext
+                .Users
+                .FirstOrDefault(x => x.Username == loginViewModel.Username &&
+                                     x.Password == hashedPassword);
 
             if (user == null)
             {
-                return this.BadRequestError("Invalid username or password!", request);
+                this.Model.Data["Error"] = "User does not exist.";
+                return this.Login();
             }
 
-            var response = new RedirectResult("/");
-            this.SignInUser(username, request, response);
+            this.SignIn(new IdentityUser()
+            {
+                Username = user.Username,
+                Password = hashedPassword,
+                Email = user.Email
+            });
 
-            return response;
+            return this.RedirectToAction("/");
         }
 
-        public IHttpResponse DoRegister(IHttpRequest request)
+        [HttpGet("/user/register")]
+        public IActionResult Register()
         {
-            var username = request.FormData["username"].ToString().Trim();
-            var password = request.FormData["password"].ToString();
-            var confirmPassword = request.FormData["confirmPassword"].ToString();
-            var email = request.FormData["email"].ToString().Trim();
-
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword) || string.IsNullOrWhiteSpace(email) || password != confirmPassword)
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (this.IsSignedIn())
             {
-                return View("/users/register", request);
+                return this.RedirectToAction("/");
             }
 
-            var hashedPassword = this.hashService.ComputeSha256Hash(password);
+            return View();
+        }
+
+        [HttpPost("/user/register")]
+        public IActionResult DoRegister(RegisterViewModel registerViewModel)
+        {
+            if (registerViewModel.Password != registerViewModel.ConfirmPassword)
+            {
+                return Register();
+            }
+
+            var hashedPassword = this.hashService.ComputeSha256Hash(registerViewModel.Password);
+
+            var userExists = this.DbContext
+                .Users
+                .FirstOrDefault(x => x.Username == registerViewModel.Username &&
+                                                                      x.Password == hashedPassword) != null;
+
+            if (userExists)
+            {
+                this.Model.Data["Error"] = $"User with username {registerViewModel.Username} already exists.";
+                return this.Register();
+            }
 
             var user = new User()
             {
-                Username = username,
+                Username = registerViewModel.Username,
                 Password = hashedPassword,
-                Email = email
+                Email = registerViewModel.Email
             };
 
-            this.dbContext.Users.Add(user);
-
-            try
-            {
-                this.dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                return BadRequestError(e.Message, request);
-            }
-
-            return this.DoLogin(request);
-
-            //return View("Index", request);
+            this.DbContext.Users.Add(user);
+            this.DbContext.SaveChanges();
+            
+            return this.DoLogin(new LoginViewModel());
         }
 
-        public IHttpResponse Logout(IHttpRequest request)
+        public IActionResult Logout()
         {
-            var response = new RedirectResult("/");
-
-            if (!this.IsAuthenticated(request))
+            if (!this.IsSignedIn())
             {
-                return response;
+                this.Model.Data["Error"] = "You cannot logout if you are not logged in.";
+                return this.RedirectToAction("/");
             }
+            this.SignOut();
 
-            this.LogoutUser(request, response);
-            return response;
+            return this.RedirectToAction("/");
         }
     }
 }
