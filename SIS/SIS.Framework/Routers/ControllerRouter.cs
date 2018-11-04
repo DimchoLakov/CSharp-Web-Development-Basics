@@ -121,6 +121,12 @@ namespace SIS.Framework.Routers
                 controllerName = "Home";
                 actionName = "Index";
             }
+            else if (requestMethod.ToUpper() == "POST")
+            {
+                var requestUrlSplit = request.Path.Split("/", StringSplitOptions.RemoveEmptyEntries);
+                controllerName = requestUrlSplit[0].Capitalize();
+                actionName = "Do" + requestUrlSplit[1].Capitalize();
+            }
             else
             {
                 var requestUrlSplit = request.Path.Split("/", StringSplitOptions.RemoveEmptyEntries);
@@ -150,40 +156,53 @@ namespace SIS.Framework.Routers
 
         private object[] MapActionParameters(Controller controller, MethodInfo action, IHttpRequest request)
         {
-            ParameterInfo[] actionParametersInfo = action.GetParameters();
-            object[] mappedActionParameters = new object[actionParametersInfo.Length];
-
-            for (int index = 0; index < actionParametersInfo.Length; index++)
+            var actionParameteres = action.GetParameters();
+            object[] mappedActionParameters = new object[actionParameteres.Length];
+            for (int i = 0; i < actionParameteres.Length; i++)
             {
-                var currentParameterInfo = actionParametersInfo[index];
-                if (currentParameterInfo.ParameterType.IsPrimitive || currentParameterInfo.ParameterType == typeof(string))
+                var actionParameter = actionParameteres[i];
+
+                if (actionParameter.ParameterType.IsPrimitive ||
+                    actionParameter.ParameterType == typeof(string))
                 {
-                    mappedActionParameters[index] = ProcessPrimitiveParameter(currentParameterInfo, request);
+                    var mappedActionParameter = new object();
+                    mappedActionParameter = this.ProcessPrimitiveParameter(actionParameter, request);
+                    if (mappedActionParameter == null)
+                    {
+                        break;
+                    }
                 }
                 else
                 {
-                    object bindingModel = ProcessBindingModelParameter(currentParameterInfo, request);
-                    controller.ModelState.IsValid = this.IsValidModel(bindingModel);
-                    mappedActionParameters[index] = bindingModel;
+                    var bindingModel = this.ProcessBindingModelParameter(actionParameter, request);
+                    controller.ModelState.IsValid = this.IsValidModel(
+                        bindingModel,
+                        actionParameter.ParameterType);
+                    mappedActionParameters[i] = bindingModel;
                 }
+
             }
 
             return mappedActionParameters;
         }
 
-        private bool IsValidModel(object bindingModel)
+        private bool? IsValidModel(object bindingModel, Type bindingModelType)
         {
-            var properties = bindingModel.GetType().GetProperties();
+            var properties = bindingModelType.GetProperties();
 
             foreach (var property in properties)
             {
-                var validationAttributes = (ValidationAttribute[])property.GetCustomAttributes().Where(ca => ca.GetType() == typeof(ValidationAttribute));
+                var propertyValidationAttributes = property
+                    .GetCustomAttributes()
+                    .Where(ca => ca is ValidationAttribute)
+                    .Cast<ValidationAttribute>()
+                    .ToList();
 
-                foreach (var attribute in validationAttributes)
+                foreach (var validationAttribute in propertyValidationAttributes)
                 {
                     var propertyValue = property.GetValue(bindingModel);
 
-                    if (!attribute.IsValid(propertyValue))
+                    if (!validationAttribute.IsValid(propertyValue))
                     {
                         return false;
                     }
@@ -204,7 +223,7 @@ namespace SIS.Framework.Routers
             {
                 try
                 {
-                    object value = this.GetParameterFromRequestData(request, property.Name);
+                    object value = this.GetParameterFromRequestData(request, property.Name.ToLower());
                     property.SetValue(bindingModelInstance, Convert.ChangeType(value, property.PropertyType));
                 }
                 catch (Exception)
@@ -224,14 +243,20 @@ namespace SIS.Framework.Routers
 
         private object GetParameterFromRequestData(IHttpRequest request, string key)
         {
-            if (request.QueryData.ContainsKey(key))
+            var queryDataKey = request.QueryData.FirstOrDefault(x => x.Key.ToLower() == key).Key;
+            var queryDataKeyExists = queryDataKey != null;
+
+            if (queryDataKeyExists)
             {
-                return request.QueryData[key];
+                return request.QueryData[queryDataKey];
             }
 
-            if (request.FormData.ContainsKey(key))
+            var formDataKey = request.FormData.FirstOrDefault(x => x.Key.ToLower() == key).Key;
+            var formDataKeyExists = formDataKey != null;
+
+            if (formDataKeyExists)
             {
-                return request.FormData[key];
+                return request.FormData[formDataKey];
             }
 
             return null;

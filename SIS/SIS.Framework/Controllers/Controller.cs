@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using SIS.Framework.ActionResults;
 using SIS.Framework.ActionResults.Interfaces;
 using SIS.Framework.Models;
@@ -25,17 +27,29 @@ namespace SIS.Framework.Controllers
 
         public Model ModelState { get; set; }
 
-        public IIdentity Identity => (IIdentity)this.Request.Session.GetParameter(SessionParameterAuth);
+        public IIdentity Identity
+            => (IIdentity)this.Request.Session.GetParameter(SessionParameterAuth);
 
-        protected IViewable View([CallerMemberName] string caller = "")
+        private ViewEngine ViewEngine { get; } = new ViewEngine();
+
+        protected IViewable View([CallerMemberName] string actionName = "")
         {
             var controllerName = ControllerUtilities.GetControllerName(this);
+            string viewContent = null;
 
-            var fullyQualifiedName = ControllerUtilities.GetViewFullQualifiedName(controllerName, caller);
+            try
+            {
+                viewContent = this.ViewEngine.GetViewContent(controllerName, actionName);
+            }
+            catch (FileNotFoundException e)
+            {
+                this.Model.Data["Error"] = e.Message;
 
-            var view = new View(fullyQualifiedName, Model.Data); // TODO DOUBLE CHECK!!!!
+                viewContent = this.ViewEngine.GetErrorContent();
+            }
 
-            return new ViewResult(view);
+            var renderedContent = this.ViewEngine.RenderHtml(viewContent, this.Model.Data);
+            return new ViewResult(new View(renderedContent));
         }
 
         protected IRedirectable RedirectToAction(string redirectUrl)
@@ -51,6 +65,11 @@ namespace SIS.Framework.Controllers
         public void SignOut()
         {
             this.Request.Session.ClearParameters();
+        }
+
+        public bool IsSignedIn()
+        {
+            return this.Identity != null;
         }
     }
 }
