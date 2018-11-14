@@ -11,6 +11,9 @@ namespace IRunes.App
         {
             dependencyContainer.RegisterDependency<IHashService, HashService>();
             dependencyContainer.RegisterDependency<IUserCookieService, UserCookieService>();
+            dependencyContainer.RegisterDependency<IUserService, UserService>();
+            dependencyContainer.RegisterDependency<IAlbumService, AlbumService>();
+            dependencyContainer.RegisterDependency<ITrackService, TrackService>();
         }
     }
 }
