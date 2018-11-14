@@ -1,23 +1,33 @@
 ﻿using System.Linq;
 using System.Text;
 using IRunes.App.Extensions;
+using IRunes.App.Services.Interfaces;
 using IRunes.App.ViewModels;
 using IRunes.Models;
-using SIS.Framework.ActionResults.Interfaces;
+using SIS.Framework.ActionResults;
 using SIS.Framework.Attributes.Action;
-using SIS.Framework.Attributes.Methods;
+using SIS.Framework.Attributes.Method;
 
 namespace IRunes.App.Controllers
 {
     public class AlbumController : BaseController
     {
+        private readonly IUserService userService;
+        private readonly IAlbumService albumService;
+
+        public AlbumController(IUserService userService, IAlbumService albumService)
+        {
+            this.userService = userService;
+            this.albumService = albumService;
+        }
+
         [Authorize]
-        [HttpGet("album/all")]
+        [HttpGet]
         public IActionResult All()
         {
             this.ShowAppropriateButtonsBasedOnLoggedIn();
 
-            var albums = this.DbContext.Albums.ToArray();
+            var albums = this.albumService.GetAllAlbums();
 
             if (albums.Any())
             {
@@ -38,7 +48,7 @@ namespace IRunes.App.Controllers
         }
 
         [Authorize]
-        [HttpGet("album/create")]
+        [HttpGet]
         public IActionResult Create()
         {
             this.ShowAppropriateButtonsBasedOnLoggedIn();
@@ -49,34 +59,18 @@ namespace IRunes.App.Controllers
             return this.View();
         }
 
-        [HttpPost("album/create")]
-        public IActionResult DoCreate(CreateAlbumViewModel viewModel)
+        [HttpPost]
+        public IActionResult Create(CreateAlbumViewModel viewModel)
         {
-            var user = this.DbContext
-                .Users
-                .FirstOrDefault(x => x.Username == this.Identity.Username &&
-                                     x.Password == this.Identity.Password);
+            var user = (User)this.userService.GetUser(this.Identity.Username, this.Identity.Password);
             
-            var album = new Album()
-            {
-                Name = viewModel.Name,
-                Cover = viewModel.Cover,
-                User = user,
-                UserId = user.Id
-            };
-
-            this.DbContext
-                .Albums
-                .Add(album);
-
-            this.DbContext
-                .SaveChanges();
+            this.albumService.AddAlbum(viewModel, user);
 
             return this.All();
         }
 
         [Authorize]
-        [HttpGet("album/details")]
+        [HttpGet]
         public IActionResult Details(AlbumDetailsViewModel viewModel)
         {
             this.ShowAppropriateButtonsBasedOnLoggedIn();
@@ -84,20 +78,15 @@ namespace IRunes.App.Controllers
             var albumId = viewModel.AlbumId;
 
             var sb = new StringBuilder();
+            var album = this.albumService.GetAlbum(viewModel);
 
-            var album = this.DbContext.Albums.FirstOrDefault(x => x.Id == albumId);
             if (album == null || !this.IsSignedIn())
             {
                 return this.RedirectToAction("/");
             }
 
-            var tracks = this.DbContext
-                .AlbumTracks
-                .Where(x => x.AlbumId == albumId)
-                .Select(x => $"<li class=\"list-group-item\"><a href=\"/track/details?albumId={albumId}&trackId={x.Track.Id}\"><strong>{x.Track.Name}</strong></a></li>")
-                .ToArray();
+            var tracksAsString = this.albumService.GetTracksAsString(albumId);
 
-            var tracksAsString = string.Join(string.Empty, tracks);
             var result = !string.IsNullOrWhiteSpace(tracksAsString) ? tracksAsString : "There are currently no tracks.";
 
             sb.Append(result);

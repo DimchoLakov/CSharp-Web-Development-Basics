@@ -1,19 +1,14 @@
-﻿using IRunes.Data;
-using SIS.Framework.Controllers;
+﻿using SIS.Framework.Controllers;
 
 namespace IRunes.App.Controllers
 {
     public abstract class BaseController : Controller
     {
-        private const string AuthKey = ".auth-IRunes";
-        private const int CookieExpiryDays = 7;
-
         protected BaseController()
         {
-            this.DbContext = new IRunesDbContext();
         }
 
-        protected IRunesDbContext DbContext { get; }
+        protected string Error { get; set; }
 
         protected void ShowAppropriateButtonsBasedOnLoggedIn()
         {
@@ -21,12 +16,27 @@ namespace IRunes.App.Controllers
             {
                 this.Model.Data["Authenticated"] = "inline";
                 this.Model.Data["NotAuthenticated"] = "none";
+                this.Model.Data["showError"] = "none";
+                this.Model.Data["errorMsg"] = "none";
             }
             else
             {
                 this.Model.Data["Authenticated"] = "none";
                 this.Model.Data["NotAuthenticated"] = "inline";
+                this.Model.Data["showError"] = "none";
+                this.Model.Data["errorMsg"] = "none";
             }
+
+            if (this.Error != null)
+            {
+                this.Model.Data["showError"] = "inline";
+                this.Model.Data["errorMsg"] = this.Error;
+            }
+        }
+
+        protected bool IsSignedIn()
+        {
+            return this.Identity != null;
         }
     }
 }

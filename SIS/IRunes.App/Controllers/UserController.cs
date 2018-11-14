@@ -1,23 +1,27 @@
-﻿using System.Linq;
-using IRunes.App.Services.Interfaces;
+﻿using IRunes.App.Services.Interfaces;
 using IRunes.App.ViewModels;
-using IRunes.Models;
-using SIS.Framework.ActionResults.Interfaces;
-using SIS.Framework.Attributes.Methods;
+using SIS.Framework.ActionResults;
+using SIS.Framework.Attributes.Method;
 using SIS.Framework.Security;
+using SIS.HTTP.Cookies;
 
 namespace IRunes.App.Controllers
 {
     public class UserController : BaseController
     {
-        private readonly IHashService hashService;
+        private const string AuthKey = ".auth-IRunes";
+        private const int CookieExpiryDays = 7;
 
-        public UserController(IHashService hashService)
+        private readonly IHashService hashService;
+        private readonly IUserService userService;
+
+        public UserController(IHashService hashService, IUserService userService)
         {
             this.hashService = hashService;
+            this.userService = userService;
         }
 
-        [HttpGet("/user/login")]
+        [HttpGet]
         public IActionResult Login()
         {
             this.ShowAppropriateButtonsBasedOnLoggedIn();
@@ -28,8 +32,8 @@ namespace IRunes.App.Controllers
             return this.View();
         }
         
-        [HttpPost("/user/login")]
-        public IActionResult DoLogin(LoginViewModel loginViewModel)
+        [HttpPost]
+        public IActionResult Login(LoginViewModel loginViewModel)
         {
             if (this.IsSignedIn())
             {
@@ -38,14 +42,11 @@ namespace IRunes.App.Controllers
 
             var hashedPassword = this.hashService.ComputeSha256Hash(loginViewModel.Password);
 
-            var user = this.DbContext
-                .Users
-                .FirstOrDefault(x => x.Username == loginViewModel.Username &&
-                                     x.Password == hashedPassword);
+            var user = this.userService.GetUser(loginViewModel.Username, hashedPassword);
 
             if (user == null)
             {
-                this.Model.Data["Error"] = "User does not exist.";
+                this.Error = $"Wrong username or password.";
                 return this.Login();
             }
 
@@ -56,10 +57,14 @@ namespace IRunes.App.Controllers
                 Email = user.Email
             });
 
+            //var userCookie = this.userCookieService.GetUserCookie(user.Username);
+            //this.Request.Cookies.Add(new HttpCookie(AuthKey, userCookie, CookieExpiryDays));
+            //this.Cookies.Add(new HttpCookie(AuthKey, userCookie, CookieExpiryDays));
+
             return this.RedirectToAction("/");
         }
 
-        [HttpGet("/user/register")]
+        [HttpGet]
         public IActionResult Register()
         {
             this.ShowAppropriateButtonsBasedOnLoggedIn();
@@ -71,48 +76,49 @@ namespace IRunes.App.Controllers
             return View();
         }
 
-        [HttpPost("/user/register")]
-        public IActionResult DoRegister(RegisterViewModel registerViewModel)
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel registerViewModel)
         {
             if (registerViewModel.Password != registerViewModel.ConfirmPassword)
             {
-                return Register();
+                this.Error = $"Passwords do not match.";
+                return this.Register();
             }
 
             var hashedPassword = this.hashService.ComputeSha256Hash(registerViewModel.Password);
 
-            var userExists = this.DbContext
-                .Users
-                .FirstOrDefault(x => x.Username == registerViewModel.Username &&
-                                                                      x.Password == hashedPassword) != null;
-
-            if (userExists)
+            var user = this.userService.GetUser(registerViewModel.Username, hashedPassword);
+            
+            if (user != null)
             {
-                this.Model.Data["Error"] = $"User with username {registerViewModel.Username} already exists.";
+                this.Error = $"User with username {registerViewModel.Username} already exists.";
                 return this.Register();
             }
 
-            var user = new User()
-            {
-                Username = registerViewModel.Username,
-                Password = hashedPassword,
-                Email = registerViewModel.Email
-            };
+            registerViewModel.Password = hashedPassword;
+            registerViewModel.ConfirmPassword = hashedPassword;
 
-            this.DbContext.Users.Add(user);
-            this.DbContext.SaveChanges();
+            this.userService.AddUser(registerViewModel);
             
-            return this.DoLogin(new LoginViewModel());
+            return this.Login(new LoginViewModel());
         }
 
         public IActionResult Logout()
         {
             if (!this.IsSignedIn())
             {
-                this.Model.Data["Error"] = "You cannot logout if you are not logged in.";
+                this.Error = "You cannot logout if you are not logged in.";
                 return this.RedirectToAction("/");
             }
             this.SignOut();
+
+            //var cookieExists = this.Request.Cookies.ContainsCookie(AuthKey);
+            //if (cookieExists)
+            //{
+            //    var cookie = this.Request.Cookies.GetCookie(AuthKey);
+            //    cookie.Delete();
+            //    this.Cookies.Add(cookie);
+            //}
 
             return this.RedirectToAction("/");
         }

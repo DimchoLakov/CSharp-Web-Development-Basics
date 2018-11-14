@@ -1,4 +1,4 @@
-﻿using SIS.Framework.ActionResults.Interfaces;
+﻿using SIS.Framework.ActionResults;
 
 namespace IRunes.App.Controllers
 {
