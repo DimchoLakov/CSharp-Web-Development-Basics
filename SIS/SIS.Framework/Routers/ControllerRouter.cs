@@ -10,6 +10,7 @@ using SIS.Framework.Controllers;
 using SIS.Framework.Routers.Contracts;
 using SIS.Framework.Services;
 using SIS.HTTP.Enums;
+using SIS.HTTP.Extensions;
 using SIS.HTTP.Requests;
 using SIS.HTTP.Responses;
 using SIS.WebServer.Results;
@@ -118,10 +119,24 @@ namespace SIS.Framework.Routers
             return null;
         }
 
-        private object GetParameterFromRequestData(IHttpRequest httpRequest, string paramName)
+        private object GetParameterFromRequestData(IHttpRequest request, string key)
         {
-            if (httpRequest.QueryData.ContainsKey(paramName)) return httpRequest.QueryData[paramName];
-            if (httpRequest.FormData.ContainsKey(paramName)) return httpRequest.FormData[paramName];
+            var queryDataKey = request.QueryData.FirstOrDefault(x => x.Key.ToLower() == key).Key;
+            var queryDataKeyExists = queryDataKey != null;
+
+            if (queryDataKeyExists)
+            {
+                return request.QueryData[queryDataKey];
+            }
+
+            var formDataKey = request.FormData.FirstOrDefault(x => x.Key.ToLower() == key).Key;
+            var formDataKeyExists = formDataKey != null;
+
+            if (formDataKeyExists)
+            {
+                return request.FormData[formDataKey];
+            }
+
             return null;
         }
 
@@ -161,7 +176,7 @@ namespace SIS.Framework.Routers
             {
                 try
                 {
-                    object value = this.GetParameterFromRequestData(httpRequest, property.Name);
+                    object value = this.GetParameterFromRequestData(httpRequest, property.Name.ToLower());
                     property.SetValue(bindingModelInstance, Convert.ChangeType(value, property.PropertyType));
                 }
                 catch
@@ -229,8 +244,8 @@ namespace SIS.Framework.Routers
         {
             string[] controllerAndActionNames = this.ExtractControllerAndActionNames(request);
 
-            string controllerName = controllerAndActionNames[0];
-            string actionName = controllerAndActionNames[1];
+            string controllerName = controllerAndActionNames[0].Capitalize();
+            string actionName = controllerAndActionNames[1].Capitalize();
 
             Controller controller = this.GetController(controllerName, request);
             MethodInfo action = this.GetMethod(request.RequestMethod.ToString(), controller, actionName);
