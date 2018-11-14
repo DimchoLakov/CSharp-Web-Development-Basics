@@ -59,6 +59,9 @@ namespace SIS.WebServer
                 return null;
             }
 
+            Console.WriteLine($"{new string('-', 7)}REQUEST{new string('-', 7)}");
+            Console.WriteLine(result);
+
             return new HttpRequest(result.ToString());
         }
 
@@ -115,6 +118,10 @@ namespace SIS.WebServer
                     this.SetResponseSession(httpResponse, sessionId);
 
                     await this.PrepareResponse(httpResponse);
+
+                    Console.WriteLine($"{new string('-', 7)}RESPONSE{new string('-', 7)}");
+                    Console.WriteLine(httpResponse);
+                    Console.WriteLine();
                 }
             }
             catch (BadRequestException e)
