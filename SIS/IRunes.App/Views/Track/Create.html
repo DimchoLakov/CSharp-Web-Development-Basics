@@ -1,0 +1,33 @@
+﻿<div class="alert alert-danger alert-dismissible" style="display:@Model.showError">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <strong>Error!</strong>  @Model.errorMsg
+</div>
+<div class="container w-50">
+    <h1>Create Track</h1>
+    <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+    <form action="/track/create?albumId=@Model.AlbumId" method="post">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input class="form-control" type="text" name="name" placeholder="Name..." required="true"/>
+        </div>
+        <div class="form-group">
+            <label for="link">Link</label>
+            <input class="form-control" type="url" name="link" placeholder="Link..." required="true"/>
+        </div>
+        <div class="form-group">
+            <label for="price">Price</label>
+            <input class="form-control" type="text" name="price" placeholder="Price..." required="true"/>
+        </div>
+        <div class="row text-center">
+            <div class="col-sm-6">
+                <div>
+                    <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Create</button>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <a class="btn btn-success" href="/album/details?albumId=@Model.AlbumId"><i class="fas fa-chevron-left"></i> Back To Album</a>
+            </div>
+        </div>
+    </form>
+    <hr style="width: 100%; color: #5cb85c; height: 1px; background-color:#5cb85c;" />
+</div>

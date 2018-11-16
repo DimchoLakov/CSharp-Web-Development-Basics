@@ -1,29 +1,17 @@
-﻿using System.Collections.Generic;
-using IRunes.Data;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
+﻿using SIS.Framework.ActionResults;
 
 namespace IRunes.App.Controllers
 {
     public class HomeController : BaseController
     {
-        private IRunesDbContext dbContext;
-
-        public HomeController()
+        public IActionResult Index()
         {
-            this.dbContext = new IRunesDbContext();
-        }
-
-        public IHttpResponse Index(IHttpRequest request)
-        {
-            var viewBag = new Dictionary<string, string>();
-            
-            if (this.IsAuthenticated(request))
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (this.IsSignedIn())
             {
-                var username = this.GetUsername(request);
-                viewBag.Add("Username", username.ToString());
+                this.Model.Data["Username"] = this.Identity.Username;
             }
-            return View("Index", request, viewBag);
+            return View();
         }
     }
 }

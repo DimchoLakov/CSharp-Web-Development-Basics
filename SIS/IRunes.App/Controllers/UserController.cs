@@ -1,125 +1,126 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using IRunes.App.Services;
-using IRunes.App.Services.Interfaces;
-using IRunes.Data;
-using IRunes.Models;
+﻿using IRunes.App.Services.Interfaces;
+using IRunes.App.ViewModels;
+using SIS.Framework.ActionResults;
+using SIS.Framework.Attributes.Method;
+using SIS.Framework.Security;
 using SIS.HTTP.Cookies;
-using SIS.HTTP.Requests;
-using SIS.HTTP.Responses;
-using SIS.WebServer.Results;
 
 namespace IRunes.App.Controllers
 {
     public class UserController : BaseController
     {
         private const string AuthKey = ".auth-IRunes";
+        private const int CookieExpiryDays = 7;
 
-        private IHashService hashService;
-        private IRunesDbContext dbContext;
-        private Dictionary<string, string> viewBag;
+        private readonly IHashService hashService;
+        private readonly IUserService userService;
 
-        public UserController()
+        public UserController(IHashService hashService, IUserService userService)
         {
-            this.hashService = new HashService();
-            this.dbContext = new IRunesDbContext();
-            this.viewBag = new Dictionary<string, string>();
+            this.hashService = hashService;
+            this.userService = userService;
         }
 
-        public IHttpResponse Login(IHttpRequest request)
+        [HttpGet]
+        public IActionResult Login()
         {
-            if (this.IsAuthenticated(request))
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (this.IsSignedIn())
             {
-                var username = this.GetUsernameFromSession(request);
-                this.viewBag.Add("Username", username);
-                return View("Index", request, viewBag);
+                return this.RedirectToAction("/");
             }
-            return View("Login", request);
+            return this.View();
         }
-
-        public IHttpResponse Register(IHttpRequest request)
+        
+        [HttpPost]
+        public IActionResult Login(LoginViewModel loginViewModel)
         {
-            if (this.IsAuthenticated(request))
+            if (this.IsSignedIn())
             {
-                return View("Index", request);
-            }
-            return View("Register", request);
-        }
-
-        public IHttpResponse DoLogin(IHttpRequest request)
-        {
-            var username = request.FormData["username"].ToString().Trim();
-            var password = request.FormData["password"].ToString();
-
-            var hashedPassword = this.hashService.ComputeSha256Hash(password);
-
-            if (this.IsAuthenticated(request))
-            {
-                return new RedirectResult("/");
+                return this.RedirectToAction("/");
             }
 
-            var user = this.dbContext.Users.FirstOrDefault(x => x.Username == username && x.Password == hashedPassword);
+            var hashedPassword = this.hashService.ComputeSha256Hash(loginViewModel.Password);
+
+            var user = this.userService.GetUser(loginViewModel.Username, hashedPassword);
 
             if (user == null)
             {
-                return this.BadRequestError("Invalid username or password!", request);
+                this.Error = $"Wrong username or password.";
+                return this.Login();
             }
 
-            var response = new RedirectResult("/");
-            this.SignInUser(username, request, response);
-
-            return response;
-        }
-
-        public IHttpResponse DoRegister(IHttpRequest request)
-        {
-            var username = request.FormData["username"].ToString().Trim();
-            var password = request.FormData["password"].ToString();
-            var confirmPassword = request.FormData["confirmPassword"].ToString();
-            var email = request.FormData["email"].ToString().Trim();
-
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(confirmPassword) || string.IsNullOrWhiteSpace(email) || password != confirmPassword)
+            this.SignIn(new IdentityUser()
             {
-                return View("/users/register", request);
-            }
-
-            var hashedPassword = this.hashService.ComputeSha256Hash(password);
-
-            var user = new User()
-            {
-                Username = username,
+                Username = user.Username,
                 Password = hashedPassword,
-                Email = email
-            };
+                Email = user.Email
+            });
 
-            this.dbContext.Users.Add(user);
+            //var userCookie = this.userCookieService.GetUserCookie(user.Username);
+            //this.Request.Cookies.Add(new HttpCookie(AuthKey, userCookie, CookieExpiryDays));
+            //this.Cookies.Add(new HttpCookie(AuthKey, userCookie, CookieExpiryDays));
 
-            try
-            {
-                this.dbContext.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                return BadRequestError(e.Message, request);
-            }
-
-            return this.DoLogin(request);
-
-            //return View("Index", request);
+            return this.RedirectToAction("/");
         }
 
-        public IHttpResponse Logout(IHttpRequest request)
+        [HttpGet]
+        public IActionResult Register()
         {
-            var response = new RedirectResult("/");
-
-            if (!this.IsAuthenticated(request))
+            this.ShowAppropriateButtonsBasedOnLoggedIn();
+            if (this.IsSignedIn())
             {
-                return response;
+                return this.RedirectToAction("/");
             }
 
-            this.LogoutUser(request, response);
-            return response;
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel registerViewModel)
+        {
+            if (registerViewModel.Password != registerViewModel.ConfirmPassword)
+            {
+                this.Error = $"Passwords do not match.";
+                return this.Register();
+            }
+
+            var hashedPassword = this.hashService.ComputeSha256Hash(registerViewModel.Password);
+
+            var user = this.userService.GetUser(registerViewModel.Username, hashedPassword);
+            
+            if (user != null)
+            {
+                this.Error = $"User with username {registerViewModel.Username} already exists.";
+                return this.Register();
+            }
+
+            registerViewModel.Password = hashedPassword;
+            registerViewModel.ConfirmPassword = hashedPassword;
+
+            this.userService.AddUser(registerViewModel);
+            
+            return this.Login(new LoginViewModel());
+        }
+
+        public IActionResult Logout()
+        {
+            if (!this.IsSignedIn())
+            {
+                this.Error = "You cannot logout if you are not logged in.";
+                return this.RedirectToAction("/");
+            }
+            this.SignOut();
+
+            //var cookieExists = this.Request.Cookies.ContainsCookie(AuthKey);
+            //if (cookieExists)
+            //{
+            //    var cookie = this.Request.Cookies.GetCookie(AuthKey);
+            //    cookie.Delete();
+            //    this.Cookies.Add(cookie);
+            //}
+
+            return this.RedirectToAction("/");
         }
     }
 }
