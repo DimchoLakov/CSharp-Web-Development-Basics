@@ -1,4 +1,4 @@
-﻿using SIS.Framework.ActionResults.Interfaces;
+﻿using SIS.Framework.ActionResults;
 using SIS.Framework.Controllers;
 
 namespace SIS.App.Controllers
